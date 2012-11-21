@@ -31,7 +31,7 @@ var Pzh_RPC = function(_parent) {
   this.messageHandler;
   this.listenerMap= {}; // holds listeners/callbacks, mostly for pzh internal api
   this.discovery;
-  this.registry;
+  this.registry; 
   this.rpcHandler;
   this.modules;         // holds startup modules
   var self = this;
