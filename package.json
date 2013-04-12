@@ -1,0 +1,23 @@
+{
+  "name": "webinos-pzhWebServer",
+  "version": "0.8.0",
+  "description": "Webinos cloud functionality is implemented in PZH WebServer",
+  "main": "./lib/startweb.js",
+  "author": "Habib Virji  <habib.virji@samsung.com>, John Lyle",
+  "homepage": "http://www.webinos.org",
+  "bugs": "http://jira.webinos.org",
+  "repositories":
+  { "type": "git",
+    "url": "git://github.com/webinos/webinos-pzhWebServer.git"
+  },
+  "dependencies": {
+    "express": "3.x.x",
+    "passport": "x.x.x",
+    "passport-yahoo": "x.x.x",
+    "passport-google": "x.x.x",
+    "jade": "*",
+    "openid": "0.x.x"
+  }
+}
+
+
