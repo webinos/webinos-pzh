@@ -1,0 +1,6 @@
+{
+    "ports": {
+        "provider": 80,
+        "provider_webServer": 443
+    }
+}

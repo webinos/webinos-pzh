@@ -1,0 +1,31 @@
+{ "name": "pzh",
+  "version": "0.1.0",
+  "description": "Webinos server side functionality",
+  "main": "./lib/pzh_sessionHandling.js",
+  "author": "Habib Virji  <habib.virji@samsung.com>",
+  "repositories":{
+     "type": "git",
+     "url": "git://github.com/webinos/webinos-pzh.git"
+   },
+  "bugs": "http://jira.webinos.org",
+  "directories": {
+    "lib": "./lib",
+    "test":"./test",
+    "web":"./web"
+  },
+  "dependencies":{
+    "webinos-jsonrpc2": "*",
+    "webinos-certificateHandler": "git://github.com/webinos/webinos-certificateHandler.git",
+    "webinos-utilities"  : "git://github.com/webinos/webinos-utilities.git",
+    "webinos-messaging"  : "git://github.com/webinos/webinos-messaging.git",
+    "webinos-api-serviceDiscovery"  : "git://github.com/webinos/webinos-api-serviceDiscovery.git",
+    "webinos-api-notificatios"  : "git://github.com/webinos/webinos-api-notifications.git",
+    "optimist": "*",
+    "webinos-pzhWebServer":"git://github.com/webinos/webinos-pzhWebServer.git"
+  },
+  "bundleDependencies":["webinos-api-test"],
+  "preferGlobal": true,
+  "bin": {
+    "webinos_pzh": "webinos_pzh.js"
+  }
+}
