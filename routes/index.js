@@ -18,9 +18,8 @@
  *******************************************************************************/
 module.exports = function (app, address, port, state) {
     "use strict";
-    var dependency = require("find-dependencies")(__dirname),
-        logger = dependency.global.require(dependency.global.util.location, "lib/logging.js")(__filename) || console,
-        pzhadaptor = require('../pzhadaptor.js'),
+    var logger = require("webinos-utilities").webinosLogging(__filename) || console,
+        pzhadaptor = require('../lib/pzhadaptor.js'),
         passport = require('passport'),
         helper = require('./helper.js');
 

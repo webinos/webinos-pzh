@@ -18,9 +18,8 @@
  *******************************************************************************/
 module.exports = function (app, address, port) {
     var openid = require('openid');
-    var dependency = require("find-dependencies")(__dirname),
-        logger = dependency.global.require(dependency.global.util.location, "lib/logging.js")(__filename) || console,
-        pzhAdaptor = require('../pzhadaptor.js'),
+    var logger = require("webinos-utilities").webinosLogging(__filename) || console,
+        pzhAdaptor = require('../lib/pzhadaptor.js'),
         helper = require('./helper.js');
 
     var attr = new openid.AttributeExchange({
