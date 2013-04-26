@@ -19,7 +19,7 @@
     "webinos-utilities"  : "git://github.com/webinos/webinos-utilities.git",
     "webinos-messaging"  : "git://github.com/webinos/webinos-messaging.git",
     "webinos-api-serviceDiscovery"  : "git://github.com/webinos/webinos-api-serviceDiscovery.git",
-    "webinos-api-notificatios"  : "git://github.com/webinos/webinos-api-notifications.git",
+    "webinos-api-notifications"  : "git://github.com/webinos/webinos-api-notifications.git",
     "optimist": "*",
     "webinos-pzhWebServer":"git://github.com/webinos/webinos-pzhWebServer.git"
   },
