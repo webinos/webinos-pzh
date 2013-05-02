@@ -1,0 +1,16 @@
+!!! 5
+html
+  head
+    title PZH Login
+    link(rel="stylesheet", type="text/css", href="/css/reset.css")
+    link(rel="stylesheet", type="text/css", href="/css/structure.css")
+    link(rel="stylesheet", type="text/css", href="/css/login.css")    
+  body
+    h1 Register for a Personal Zone Hub
+    p Please sign up to create your own webinos Personal Zone Hub
+    form(action="/createPzh", method="POST")
+      input(type="submit", class="btnLogin", value="Sign up!")
+    footer#main
+      a(href="http://www.webinos.org") Powered by webinos
+      |  |
+      a(href="http://developer.webinos.org")  Developer resources on webinos

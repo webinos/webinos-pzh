@@ -21,6 +21,7 @@ module.exports = function (app, address, port, state) {
     var logger = require("webinos-utilities").webinosLogging(__filename) || console,
         pzhadaptor = require('../lib/pzhadaptor.js'),
         passport = require('passport'),
+        util = require('util'),
         helper = require('./helper.js');
 
     app.get('/', ensureAuthenticated, function (req, res) {
@@ -29,16 +30,22 @@ module.exports = function (app, address, port, state) {
             req.session.isPzp = "";
             req.session.pzpPort = "";
         } else {
-            res.redirect('/main/' + getUserPath(req.user) + "/");
+            hasPZHSelector( req.user, 
+              function() {
+                res.redirect('/main/' + getUserPath(req.user) + "/");
+              }, 
+              function() {
+                res.redirect('/signup/');
+              });
         }
     });
 
-    app.post('/main/:user/enrollPzp/', function (req, res) { // to use ensure authenticated, for some reason req.isAuthenticated retuns false
-        pzhadaptor.fromWeb(req.params.user,
-            {payload:{status:"enrollPzp", csr:req.body.csr, authCode:req.body.authCode, from:req.body.from}}, res);
-    });
-
-    app.get('/main/:user/', ensureAuthenticated, function (req, res) {
+//    app.post('/main/:user/enrollPzp/', function (req, res) { // to use ensure authenticated, for some reason req.isAuthenticated retuns false
+//        pzhadaptor.fromWeb(req.params.user,
+//            {payload:{status:"enrollPzp", csr:req.body.csr, authCode:req.body.authCode, from:req.body.from}}, res);
+//    });
+//
+    app.get('/main/:user/', ensureAuthenticated, ensureHasPzh, function (req, res) {
         if (encodeURIComponent(req.params.user) !== getUserPath(req.user)) {
             logger.log(encodeURIComponent(req.params.user) + " does not equal " + getUserPath(req.user));
             res.redirect('/login');
@@ -68,7 +75,7 @@ module.exports = function (app, address, port, state) {
         pzhadaptor.fromWebUnauth(req.params.useremail, {type:"getCertificates"}, res);
     });
 
-    app.post('/main/:user/pzpEnroll', ensureAuthenticated, function (req, res) {
+    app.post('/main/:user/pzpEnroll', ensureAuthenticated, ensureHasPzh, function (req, res) {
         var dataSend = {
             payload:{
                 status:"csrAuthCodeByPzp",
@@ -81,7 +88,7 @@ module.exports = function (app, address, port, state) {
     });
 
     //TODO: This should be a POST interface, not a GET interface.
-    app.get('/main/:user/connect-friend-local', ensureAuthenticated, function (req, res) {
+    app.get('/main/:user/connect-friend-local', ensureAuthenticated, ensureHasPzh, function (req, res) {
         //Args: The external user's email address
         //Auth: User must have logged into their PZH
         //UI: NONE
@@ -107,7 +114,7 @@ module.exports = function (app, address, port, state) {
 
     //Certificate exchange...
     //TODO: This should be a POST interface, not a GET interface.
-    app.get('/main/:user/connect-friend', ensureAuthenticated, function (req, res) {
+    app.get('/main/:user/connect-friend', ensureAuthenticated, ensureHasPzh, function (req, res) {
         //Args: The external user's email address and PZH provider
         //Auth: User must have logged into their PZH
         //UI: NONE
@@ -149,18 +156,19 @@ module.exports = function (app, address, port, state) {
 
     });
 
-    //TODO WARNING: This seems like a dodgy function.  Anyone can invoke it.  Make sure that secret is long...
-    //    app.post('/main/:user/request-access/:external/', function(req, res) {
-    //Args: External user's PZH URL
-    //Args: Secret token
-    //Args: Certificate for external PZH
+    app.post('/createPzh', ensureAuthenticated, function(req,res) {
+      console.log("I've been asked to create a PZH");
+      pzhadaptor.addPzh(req.user, function(userid) {
+          console.log("User added, redirecting");
+          res.redirect('/main/' + getUserPath(req.user) + "/");      
+      });
+    });
 
-    //Auth: check that the URL is expected and that the certificate is valid and that the certificate is valid for this URL.
-    //UI: None
-    //Action: add this user to the trusted list
-    //    });
+    app.get('/signup/', ensureAuthenticated, function(req,res) {
+      res.render("signup", {user:req.user});
+    });
 
-    app.get('/main/:user/approve-user/:externalemail/', ensureAuthenticated, function (req, res) {
+    app.get('/main/:user/approve-user/:externalemail/', ensureAuthenticated, ensureHasPzh, function (req, res) {
         pzhadaptor.getRequestingExternalUser(req.user, req.params.externalemail, function (answer) {
             if (answer.message) {
                 res.render("approve-user", {user:req.user, externalUser:req.params.externalemail});
@@ -175,7 +183,7 @@ module.exports = function (app, address, port, state) {
         //Actions: have a button that, once approved, add the external user's certificate details to the trusted list.
     });
 
-    app.post('/main/:user/make-user-decision/', ensureAuthenticated, function (req, res) {
+    app.post('/main/:user/make-user-decision/', ensureAuthenticated, ensureHasPzh, function (req, res) {
         if (req.body.decision && req.user) {
             pzhadaptor.approveFriend(req.user, req.body.decision, res);
         } else {
@@ -248,6 +256,39 @@ module.exports = function (app, address, port, state) {
             return next();
         }
         res.redirect('/login');
+    }
+    
+    // A customisable version of the above.
+    function ensureAuthenticatedRedirect(redirectPath) {
+        return function(req, res, next) {
+            if (req.isAuthenticated()) {
+                return next();
+            }
+            res.redirect(redirectPath);
+        }
+    }
+    
+    // must be called after ensureAuthenticated
+    function ensureHasPzh(req, res, next) {
+        hasPZHSelector(req.user, next, function() {
+          res.redirect('/login');
+        });
+    }
+    
+    // Use this to check that the user has a PZH, as well as being authenticated.
+    //
+    function hasPZHSelector(user, yesFn, noFn) {
+        console.log("Checking to see if the user already exists");
+        pzhadaptor.checkUserHasPzh(user, function(answer) {
+          console.log("Answer: " + util.inspect(answer.message));
+          if (answer.message) {
+            console.log("Did have a PZH");
+            yesFn();
+          } else {
+            console.log("Didn't have an existing PZH");
+            noFn();
+          }
+        });
     }
 
     function getUserPath(user) {
