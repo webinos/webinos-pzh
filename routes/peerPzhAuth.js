@@ -17,144 +17,103 @@
  * Author: Habib Virji (habib.virji@samsung.com)
  *******************************************************************************/
 module.exports = function (app, address, port) {
-    var openid = require('openid');
     var logger = require("webinos-utilities").webinosLogging(__filename) || console,
         pzhAdaptor = require('../lib/pzhadaptor.js'),
+        util = require("util"),
         helper = require('./helper.js');
 
-    var attr = new openid.AttributeExchange({
-        "http://axschema.org/contact/country/home":"required",
-        "http://axschema.org/namePerson/first":"required",
-        "http://axschema.org/pref/language":"required",
-        "http://axschema.org/namePerson/last":"required",
-        "http://axschema.org/contact/email":"required",
-        "http://axschema.org/namePerson/friendly":"required",
-        "http://axschema.org/namePerson":"required",
-        "http://axschema.org/media/image/default":"required",
-        "http://axschema.org/person/gender/":"required"
-    });
-
-    app.get('/main/:useremail/request-access-login', function (req, res) {
-        //Args: External user's PZH URL
-        //Args: External user's PZH certificate
-        //Auth: Check that the certificate is valid and that the certificate is valid for this URL.
-        //UI: Presents a button that the user must click to confirm the request
-        //UI: External user must then present an OpenID account credential...
-        //sets req.externalprovider
-        var externalCertUrl = req.query.certUrl;
-        var externalPZHUrl = req.query.pzhInfo;
-        var externalEmailId = req.query.ownEmailId;
-        res.render('login-remote', {user:encodeURIComponent(req.params.useremail),
-            externalCertUrl:encodeURIComponent(externalCertUrl),
-            externalPZHUrl:encodeURIComponent(externalPZHUrl),
-            externalEmailId:encodeURIComponent(externalEmailId)});
-    });
-
-    app.get('/main/:useremail/request-access-authenticate', function (req, res) {
-        //Args: External user's PZH URL
-        //Args: External user's PZH certificate
-        //Auth: Check that the certificate is valid and that the certificate is valid for this URL.
-        //UI: Presents a button that the user must click to confirm the request
-        //UI: External user must then present an OpenID account credential...
-
-        var externalRelyingParty = new openid.RelyingParty(
-            'https://' + address + ':' + port + '/main/' + encodeURIComponent(req.params.useremail) + '/request-access-verify',
-            null, false, false, [attr]);
-
-        //'&externalCertUrl=' + encodeURIComponent(req.query.externalCertUrl) +  '&externalPZHUrl=' +  encodeURIComponent(req.query.externalPZHUrl)
-
-        var identifierUrl = (req.query.externalprovider === "google") ? 'http://www.google.com/accounts/o8/id' :
-            'http://open.login.yahooapis.com/openid20/www.yahoo.com/xrds';
-
-        externalRelyingParty.authenticate(identifierUrl, false, function (error, authUrl) {
-            if (error) {
-                res.writeHead(200);
-                res.end('Authentication failed: ' + error.message);
-            } else if (!authUrl) {
-                res.writeHead(200);
-                res.end('Authentication failed');
+    
+   // This is the landing page for external users
+   // They get redirected to authenticate, then land up here again
+   // There should be plenty of data in the session about them, including:
+   // req.session.externalCertUrl
+   // req.session.externalPZHUrl
+   // req.session.externalEmailId
+    app.get('/main/:useremail/request-access-login', function(req, res) {       
+        if (recordVarsInSession(req,res)) {
+            if (req.isAuthenticated()) {
+                makeConnectionRequest(req,res);
             } else {
-                //this data needs to come with us on the next attempt...
-                req.session.expectedExternalAuth = {
-                    internalUser:req.params.useremail,
-                    externalCertUrl:req.query.externalCertUrl,
-                    externalPZHUrl:req.query.externalPZHUrl,
-                    externalRelyingParty:req.query.externalprovider,
-                    externalEmailId:req.query.externalEmailId,
-                    externalAuthUrl:authUrl
-                };
-                res.writeHead(302, { Location:authUrl });
-                res.end();
+                redirectToLogin(req,res);
             }
-        });
+        } else {
+            res.writeHead(200);
+            res.end('Error: wrong parameters in request');
+        }
     });
 
-    app.get('/main/:useremail/request-access-verify', function (req, res) {
-        //Args: External user's PZH URL
-        //Args: External user's PZH certificate
-        //Auth: Check that the certificate is valid and that the certificate is valid for this URL.
-        //Auth: OpenID credential.  THis is the redirect from a provider.
-        //UI: Present some confirmation
+    function makeConnectionRequest(req,res) {   
+        var internalUser = req.params.useremail;
+        logger.log("Successfully authenticated external user: " + req.user.emails[0].value +
+                      " who wants to connect to " + internalUser + 
+                      " and who claims to have: " + req.session.externalCertUrl +
+                      " and " + req.session.externalPZHUrl);
+        
+        // Now, we need to get the certs of this external user
+        var externalUrl = require("url").parse( req.session.externalCertUrl );
+        // Parse out the address and port out of the external URL
+        var options = {
+            host:externalUrl.hostname,
+            port:externalUrl.port || 443,
+            path:"/main/" + encodeURIComponent(req.user.emails[0].value) + "/certificates/",
+            method:"GET"
+        };
 
-        var externalRelyingParty = new openid.RelyingParty(
-            'https://' + address + ':' + port + '/main/' + encodeURIComponent(req.params.useremail) + '/request-access-verify',
-            null, false, false, [attr]);
-
-        externalRelyingParty.verifyAssertion(req, function (error, result) {
-            if (error) {
-                res.writeHead(200);
-                res.end('Authentication failed');
-            } else {
-                logger.log("Successfully authenticated external user: " + result.email +
-                    "who claims to have: " + req.session.expectedExternalAuth.externalCertUrl +
-                    " and " + req.session.expectedExternalAuth.externalPZHUrl);
-
-                if (!req.session.expectedExternalAuth.externalCertUrl) {
-                    res.writeHead(200);
-                    res.end('Failed to read cookies');
-                }
-                var session = req.session.expectedExternalAuth;
-                if (result.email !== session.externalEmailId) {
-                    res.writeHead(200);
-                    res.end('User authenticated ' + result.email + ' is different from the one that originated request');
-                } else {
-                    var externalUrl = require("url").parse(req.session.expectedExternalAuth.externalCertUrl);
-                    // Parse out the address and port out of the external URL
-                    var options = {
-                        host:externalUrl.hostname,
-                        port:externalUrl.port || 443,
-                        path:"/main/" + encodeURIComponent(result.email) + "/certificates/",
-                        method:"GET"
-
-                    };
-
-                    helper.getCertsFromHostDirect(options, function (certs) {
-                        var pzhData = {
-                            pzhCerts:certs.message,
-                            externalCertUrl:session.externalCertUrl,
-                            externalPZHUrl:session.externalPZHUrl,
-                            externalRelyingParty:session.externalRelyingParty,
-                            externalAuthUrl:session.externalAuthUrl
-                        };
-                        pzhAdaptor.requestAddFriend(session.internalUser, result, pzhData, function (status) {
-                            //TODO: Check we're dealing with the same _internal_ user
-                            // This is for the same user...
-                            // This is redirecting to the originator of request... but url is  pointing to the request-verify.. what to do?
-                            if (status.message) {
-                                res.render("external-request-success",
-                                    {externaluser:result, user:session.internalUser,
-                                        externalPzhUrl:session.externalPZHUrl});
-                            } else {
-                                res.writeHead(200);
-                                res.end('User ' + result.email + ' different from the one that initiated request');
-                            }
+        helper.getCertsFromHostDirect(options, function (certs) {
+            var pzhData = {
+                pzhCerts:certs.message,
+                externalCertUrl:req.session.externalCertUrl,
+                externalPZHUrl:req.session.externalPZHUrl
+            };
+            pzhAdaptor.requestAddFriend(internalUser, req.user, pzhData, function (status) {
+                if (status.message) {
+                    res.render("external-request-success",
+                        { "externaluser" : req.user, 
+                          "user" : internalUser,
+                          "externalPzhUrl" : req.session.externalPZHUrl
                         });
-                    }, function (err) {
-                        res.writeHead(200);
-                        res.end('Failed to retrieve certificate from remote host');
-                    });
+                } else {
+                    res.writeHead(200);
+                    res.end('Error requesting inter-zone connection');
+                    return;
                 }
-            }
+            });
+        }, function (err) {
+            res.writeHead(200);
+            res.end('Failed to retrieve certificate from remote host');
+            return;
         });
-    });
+    }
+    
+    /**
+     * Record incoming variables to the session, return false if no variables
+     * are found or already present.
+     *
+     * Expected query:
+     * ?certUrl=...&pzhInfo?...&ownEmailId?foo%40smith.com...
+     * 
+     */
+    function recordVarsInSession(req, res) {
+        if (!req.hasOwnProperty("query")) return false;
+        if ((typeof req.query.certUrl !== 'undefined') &&
+              (typeof req.query.pzhInfo !== 'undefined') &&
+              (typeof req.query.ownEmailId !== 'undefined')) {
+            req.session.externalCertUrl = req.query.certUrl;
+            req.session.externalPZHUrl = req.query.pzhInfo;
+            req.session.externalEmailId = req.query.ownEmailId;
+            req.session.internalUser = req.params.useremail;            
+            return true;
+        } else {
+            return req.session.hasOwnProperty("externalCertUrl") && 
+              req.session.hasOwnProperty("externalPZHUrl") && 
+              req.session.hasOwnProperty("externalEmailId") && 
+              req.session.hasOwnProperty("internalUser");
+        }
+    }
+
+    // This is where we redirect if they are not authenticated.
+    function redirectToLogin(req, res) {
+        req.session.isExternal = true;          
+        res.render('login-remote', {"internalUser":req.params.useremail});
+    }
 };

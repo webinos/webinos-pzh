@@ -20,15 +20,17 @@ module.exports = function (app, address, port, state) {
     "use strict";
     var logger = require("webinos-utilities").webinosLogging(__filename) || console,
         pzhadaptor = require('../lib/pzhadaptor.js'),
-        passport = require('passport'),
         util = require('util'),
         helper = require('./helper.js');
 
     app.get('/', ensureAuthenticated, function (req, res) {
         if (req.session.isPzp) {
+            //TODO: What happens when attempting to enrol despite not having a PZH?
             pzhadaptor.fromWeb(req.user, {payload:{status:"enrollPzpAuthCode", address:address, port:port, pzpPort:req.session.pzpPort, user:getUserPath(req.user)}}, res);
             req.session.isPzp = "";
             req.session.pzpPort = "";
+        } else if (req.session.isExternal) {
+            res.redirect('/main/' + req.session.internalUser + '/request-access-login');
         } else {
             hasPZHSelector( req.user, 
               function() {
@@ -40,11 +42,6 @@ module.exports = function (app, address, port, state) {
         }
     });
 
-//    app.post('/main/:user/enrollPzp/', function (req, res) { // to use ensure authenticated, for some reason req.isAuthenticated retuns false
-//        pzhadaptor.fromWeb(req.params.user,
-//            {payload:{status:"enrollPzp", csr:req.body.csr, authCode:req.body.authCode, from:req.body.from}}, res);
-//    });
-//
     app.get('/main/:user/', ensureAuthenticated, ensureHasPzh, function (req, res) {
         if (encodeURIComponent(req.params.user) !== getUserPath(req.user)) {
             logger.log(encodeURIComponent(req.params.user) + " does not equal " + getUserPath(req.user));
@@ -58,15 +55,6 @@ module.exports = function (app, address, port, state) {
     app.post('/main/:user/query', ensureAuthenticated, function (req, res) {
         logger.log("Body: " + require("util").inspect(req.body));
         pzhadaptor.fromWeb(req.user, req.body, res);
-    });
-
-    // A couple of unused REST interfaces
-    app.post('/main/:user/zonestatus/', ensureAuthenticated, function (req, res) {
-        pzhadaptor.getZoneStatus(req.user, res);
-    });
-
-    app.all('/main/:user/about-me/', ensureAuthenticated, function (req, res) {
-        res.json(req.user);
     });
 
     // present certificates to an external party.
@@ -192,59 +180,7 @@ module.exports = function (app, address, port, state) {
         res.redirect('/');
     });
 
-    app.get('/login', function (req, res) {
-        if (req.query.isPzp) {
-            req.session.isPzp = true;
-            req.session.pzpPort = req.query.port;
-        }
-        res.render('login', { user:req.user });
-    });
-    // GET /auth/google
-    //   Use passport.authenticate() as route middleware to authenticate the
-    //   request.  The first step in Google authentication will involve redirecting
-    //   the user to google.com.  After authenticating, Google will redirect the
-    //   user back to this application at /auth/google/return
-    app.get('/auth/google',
-        passport.authenticate('google', { failureRedirect:'/login' }),
-        function (req, res) {
-            res.redirect('/');
-        }
-    );
 
-    // GET /auth/google/return
-    //   Use passport.authenticate() as route middleware to authenticate the
-    //   request.  If authentication fails, the user will be redirected back to the
-    //   login page.  Otherwise, the primary route function function will be called,
-    //   which, in this example, will redirect the user to the home page.
-    app.get('/auth/google/return',
-        passport.authenticate('google', { failureRedirect:'/login' }),
-        function (req, res) {
-            res.redirect('/');
-        }
-    );
-
-    app.get('/logout', function (req, res) {
-        req.logout();
-        //window.open('https://www.google.com/accounts/Logout');
-        //window.open('https://login.yahoo.com/config/login?logout=1');
-        res.redirect('/');
-    });
-
-    app.get('/auth/yahoo',
-        passport.authenticate('yahoo'),
-        function (req, res) {
-            // The request will be redirected to Yahoo for authentication, so
-            // this function will not be called.
-        }
-    );
-
-    app.get('/auth/yahoo/return',
-        passport.authenticate('yahoo', { failureRedirect:'/login' }),
-        function (req, res) {
-            // Successful authentication, redirect home.
-            res.redirect('/');
-        }
-    );
 
     // Simple route middleware to ensure user is authenticated.
     //   Use this route middleware on any resource that needs to be protected.  If
@@ -257,17 +193,7 @@ module.exports = function (app, address, port, state) {
         }
         res.redirect('/login');
     }
-    
-    // A customisable version of the above.
-    function ensureAuthenticatedRedirect(redirectPath) {
-        return function(req, res, next) {
-            if (req.isAuthenticated()) {
-                return next();
-            }
-            res.redirect(redirectPath);
-        }
-    }
-    
+
     // must be called after ensureAuthenticated
     function ensureHasPzh(req, res, next) {
         hasPZHSelector(req.user, next, function() {
