@@ -25,11 +25,14 @@ module.exports = function (app, address, port, authConfig) {
         util = require('util');
     
     app.get('/login', function (req, res) {
+        var isPzp = false;
         if (req.query.isPzp) {
             req.session.isPzp = true;
             req.session.pzpPort = req.query.port;
+            isPzp = true;
         }
-        res.render('login', { user:req.user, auth:authConfig });
+        
+        res.render('login', { user:req.user, auth:authConfig, "isPzp": req.query.isPzp, "isExternal" : false });
     });
     
     app.get('/logout', function (req, res) {

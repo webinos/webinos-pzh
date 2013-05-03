@@ -16,7 +16,7 @@
  * Copyright 2012 - 2013 Samsung Electronics (UK) Ltd
  * Author: Habib Virji (habib.virji@samsung.com)
  *******************************************************************************/
-module.exports = function (app, address, port) {
+module.exports = function (app, address, port, authConfig) {
     var logger = require("webinos-utilities").webinosLogging(__filename) || console,
         pzhAdaptor = require('../lib/pzhadaptor.js'),
         util = require("util"),
@@ -114,6 +114,6 @@ module.exports = function (app, address, port) {
     // This is where we redirect if they are not authenticated.
     function redirectToLogin(req, res) {
         req.session.isExternal = true;          
-        res.render('login-remote', {"internalUser":req.params.useremail});
+        res.render('login', { auth:authConfig, "isPzp" : false, "isExternal" : true, "internalUser":req.params.useremail});
     }
 };

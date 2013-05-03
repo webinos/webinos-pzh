@@ -1,31 +1,32 @@
 !!! 5
 html
   head
+    - if (isExternal) {
+    title Please login to access #{internalUser}'s personal zone hub
+    - } else {
     title PZH Login
-
+    - }
     link(rel="stylesheet", type="text/css", href="/css/reset.css")
     link(rel="stylesheet", type="text/css", href="/css/structure.css")
     link(rel="stylesheet", type="text/css", href="/css/login.css")
-
-    script
-      function loginGoogle() {
-        window.location.href = "/auth/google";
-      }
-      function loginYahoo() {
-        window.location.href = "/auth/yahoo";
-      }
-      function loginFacebook() {
-        window.location.href = "/auth/facebook";
-      }
-      function loginTwitter() {
-        window.location.href = "/auth/twitter";
-      }
+    - if (isPzp) {
+    script(type="text/javascript", src="/js/view-login.js")
+    - } else {
+    script(type="text/javascript", src="../webinos.js")
+    script(type="text/javascript", src="/js/view-login-pzp.js")    
+    - }
 
   body
     form.box.login
       header
         img(src="http://webinos.org/wp-content/themes/parallelus-unite/images/webinos_logo.png", width="100px")
+        - if (isExternal) {
+        label Connect to #{internalUser}
+        - } else if (isPzp) {
+        label Request access to this zone: login
+        - } else {
         label Personal Zone Hub login
+        - }
         // <label>Please login to you personal zone hub using one of the following methods.</label>
         // TODO: "If you do not have an account, click..."
         // TODO: Fix stylesheet so that addition text can be added here if necessary
