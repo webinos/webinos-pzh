@@ -24,23 +24,41 @@ module.exports = function (app, address, port, state) {
         helper = require('./helper.js');
 
     app.get('/', ensureAuthenticated, function (req, res) {
-        if (req.session.isPzp) {
-            //TODO: What happens when attempting to enrol despite not having a PZH?
-            pzhadaptor.fromWeb(req.user, {payload:{status:"enrollPzpAuthCode", address:address, port:port, pzpPort:req.session.pzpPort, user:getUserPath(req.user)}}, res);
-            req.session.isPzp = "";
-            req.session.pzpPort = "";
-        } else if (req.session.isExternal) {
-            res.redirect('/main/' + req.session.internalUser + '/request-access-login');
-        } else {
-            hasPZHSelector( req.user, 
-              function() {
-                res.redirect('/main/' + getUserPath(req.user) + "/");
-              }, 
-              function() {
-                res.redirect('/signup/');
-              });
-        }
+        hasPZHSelector( req.user, 
+            function() {
+                // You have a PZH.  Are you a PZP enrolling?  If so, we've got to enroll you.
+                if (req.session.isPzp) {
+                    handleEnrolmentPostLogin(req,res);
+                } else {
+                    res.redirect('/main/' + getUserPath(req.user) + "/");
+                }
+            }, 
+            function() {
+                // No PZH? Then either you're here to request access to someone 
+                // else's PZP, or you should go and sign up for one.
+                if (req.session.isExternal) {
+                    res.redirect('/main/' + req.session.internalUser + '/request-access-login');
+                } else {
+                    res.redirect('/signup/');             
+                }
+            }
+        );
     });
+    
+    function handleEnrolmentPostLogin(req,res) {
+        var pzpPort = req.session.pzpPort;
+        req.session.isPzp = "";
+        req.session.pzpPort = "";
+        pzhadaptor.enrollPzpWithAuthCode( req.user, function(msg) {
+            res.render("enroll-pzp", {
+                "address":address, 
+                "port":port, 
+                "authCode":msg.message.payload.code, 
+                "user":req.user, 
+                "pzpPort":pzpPort
+            });
+        });
+    }
 
     app.get('/main/:user/', ensureAuthenticated, ensureHasPzh, function (req, res) {
         if (encodeURIComponent(req.params.user) !== getUserPath(req.user)) {
