@@ -10,10 +10,10 @@ html
     link(rel="stylesheet", type="text/css", href="/css/structure.css")
     link(rel="stylesheet", type="text/css", href="/css/login.css")
     - if (isPzp) {
-    script(type="text/javascript", src="/js/view-login.js")
-    - } else {
     script(type="text/javascript", src="../webinos.js")
     script(type="text/javascript", src="/js/view-login-pzp.js")    
+    - } else {
+    script(type="text/javascript", src="/js/view-login.js")
     - }
 
   body

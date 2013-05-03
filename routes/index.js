@@ -47,7 +47,7 @@ module.exports = function (app, address, port, state) {
             logger.log(encodeURIComponent(req.params.user) + " does not equal " + getUserPath(req.user));
             res.redirect('/login');
         } else {
-            res.render('main', { user:getUserPath(req.user) });
+            res.render('main', { user:getUserPath(req.user), profile:req.user });
         }
     });
 
