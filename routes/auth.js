@@ -18,63 +18,84 @@
  * Author: Habib Virji (habib.virji@samsung.com)
  *******************************************************************************/
 
-module.exports = function (app, address, port, state) {
+module.exports = function (app, address, port, authConfig) {
     "use strict";
     var logger = require("webinos-utilities").webinosLogging(__filename) || console,
         passport = require('passport'),
         util = require('util');
     
-        app.get('/login', function (req, res) {
+    app.get('/login', function (req, res) {
         if (req.query.isPzp) {
             req.session.isPzp = true;
             req.session.pzpPort = req.query.port;
         }
-        res.render('login', { user:req.user });
+        res.render('login', { user:req.user, auth:authConfig });
     });
     
-    // GET /auth/google
-    //   Use passport.authenticate() as route middleware to authenticate the
-    //   request.  The first step in Google authentication will involve redirecting
-    //   the user to google.com.  After authenticating, Google will redirect the
-    //   user back to this application at /auth/google/return
-    app.get('/auth/google',
-        passport.authenticate('google', { failureRedirect:'/login' }),
-        function (req, res) {
-            res.redirect('/');
-        }
-    );
-
-    // GET /auth/google/return
-    //   Use passport.authenticate() as route middleware to authenticate the
-    //   request.  If authentication fails, the user will be redirected back to the
-    //   login page.  Otherwise, the primary route function function will be called,
-    //   which, in this example, will redirect the user to the home page.
-    app.get('/auth/google/return',
-        passport.authenticate('google', { failureRedirect:'/login' }),
-        function (req, res) {
-            res.redirect('/');
-        }
-    );
-
     app.get('/logout', function (req, res) {
         req.logout();
         //window.open('https://www.google.com/accounts/Logout');
         //window.open('https://login.yahoo.com/config/login?logout=1');
         res.redirect('/');
     });
+    
+    // todo : finish selecting for authentication methods that are enabled.
+    if (authConfig.facebook.enabled) {
+        
+        app.get(authConfig.facebook.authpath, 
+            passport.authenticate('facebook', { successRedirect: '/',
+                                                failureRedirect: '/login' }));
+        
+        //app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+        app.get('/auth/facebook', passport.authenticate('facebook'));
+        // made the decision NOT to request email address: we're just going to make it
+        // based on the user name and @facebook.com.  Reason - otherwise people can
+        // assert any email address, we lose connection with the provider.
+    }
+    
+    if (authConfig.google.enabled) {
+      // GET /auth/google
+      //   Use passport.authenticate() as route middleware to authenticate the
+      //   request.  The first step in Google authentication will involve redirecting
+      //   the user to google.com.  After authenticating, Google will redirect the
+      //   user back to this application at /auth/google/return
+      app.get('/auth/google',
+          passport.authenticate('google', { failureRedirect:'/login' }),
+          function (req, res) {
+              res.redirect('/');
+          }
+      );
 
-    app.get('/auth/yahoo',
-        passport.authenticate('yahoo'),
-        function (req, res) {
-            // The request will be redirected to Yahoo for authentication, so
-            // this function will not be called.
-        }
-    );
-    app.get('/auth/yahoo/return',
-        passport.authenticate('yahoo', { failureRedirect:'/login' }),
-        function (req, res) {
-            // Successful authentication, redirect home.
-            res.redirect('/');
-        }
-    );
+      // GET /auth/google/return
+      //   Use passport.authenticate() as route middleware to authenticate the
+      //   request.  If authentication fails, the user will be redirected back to the
+      //   login page.  Otherwise, the primary route function function will be called,
+      //   which, in this example, will redirect the user to the home page.
+      app.get('/auth/google/return',
+          passport.authenticate('google', { failureRedirect:'/login' }),
+          function (req, res) {
+              res.redirect('/');
+          }
+      );
+    }
+    
+    
+    if (authConfig.yahoo.enabled) {
+      app.get('/auth/yahoo',
+          passport.authenticate('yahoo'),
+          function (req, res) {
+              // The request will be redirected to Yahoo for authentication, so
+              // this function will not be called.
+          }
+      );
+      app.get('/auth/yahoo/return',
+          passport.authenticate('yahoo', { failureRedirect:'/login' }),
+          function (req, res) {
+              // Successful authentication, redirect home.
+              res.redirect('/');
+          }
+      );
+    }
+    
+    
 }

@@ -136,18 +136,14 @@ module.exports = function (app, address, port, state) {
                 res.end('Failed to retrieve certificate from remote host');
             });
         }
-
         // technically this is a problem.
         // someone could change the URI in transit to transfer different certificates
         // this would make Bob think that Alice was from a different personal zone.
         // TODO: Work out some way of putting the 'get' data into the body, despite this being a redirect.
-
     });
 
     app.post('/createPzh', ensureAuthenticated, function(req,res) {
-      console.log("I've been asked to create a PZH");
       pzhadaptor.addPzh(req.user, function(userid) {
-          console.log("User added, redirecting");
           res.redirect('/main/' + getUserPath(req.user) + "/");      
       });
     });
@@ -180,8 +176,6 @@ module.exports = function (app, address, port, state) {
         res.redirect('/');
     });
 
-
-
     // Simple route middleware to ensure user is authenticated.
     //   Use this route middleware on any resource that needs to be protected.  If
     //   the request is authenticated (typically via a persistent login session),
@@ -202,21 +196,16 @@ module.exports = function (app, address, port, state) {
     }
     
     // Use this to check that the user has a PZH, as well as being authenticated.
-    //
+    // TODO: Cache this information to save some time.
     function hasPZHSelector(user, yesFn, noFn) {
-        console.log("Checking to see if the user already exists");
         pzhadaptor.checkUserHasPzh(user, function(answer) {
-          console.log("Answer: " + util.inspect(answer.message));
           if (answer.message) {
-            console.log("Did have a PZH");
             yesFn();
           } else {
-            console.log("Didn't have an existing PZH");
             noFn();
           }
         });
     }
-
     function getUserPath(user) {
         return encodeURIComponent(user.emails[0].value);
     }

@@ -15,6 +15,7 @@
     "passport": "x.x.x",
     "passport-yahoo": "x.x.x",
     "passport-google": "x.x.x",
+    "passport-facebook": "x.x.x",
     "jade": "*",
     "webinos-utilities"  : "git://github.com/webinos/webinos-utilities.git",
     "webinos-certificateHandler": "git://github.com/webinos/webinos-certificateHandler.git",
