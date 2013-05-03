@@ -17,6 +17,9 @@ html
       function loginFacebook() {
         window.location.href = "/auth/facebook";
       }
+      function loginTwitter() {
+        window.location.href = "/auth/twitter";
+      }
 
   body
     form.box.login
@@ -42,6 +45,11 @@ html
         img(src='http://cav2013.forsyte.at/files/facebook-logo.jpg', width="100px")
         input(type="button", class="btnLogin", onclick="loginFacebook()", value="Login via Facebook")
         - }
+        - if (auth.twitter.enabled) {
+        label Login using your Twitter ID
+        img(src='https://twitter.com/images/resources/twitter-bird-light-bgs.png', height="45px")
+        input(type="button", class="btnLogin", onclick="loginTwitter()", value="Login via Twitter")
+        - }        
     footer#main
       a(href="http://www.webinos.org") Powered by webinos
       |  |

@@ -1,8 +1,13 @@
 { "authentication" :
     { "facebook" : 
-      { "clientID"     : ""
-      , "clientSecret" : ""
-      , "callbackURL"  : ""
+      { "clientID"       : ""
+      , "clientSecret"   : ""
+      , "callbackURL"    : ""
       }
-    }
+    , "twitter" :
+      { "consumerKey"    : ""
+      , "consumerSecret" : ""
+      , "callbackURL"    : ""
+      }
+    } 
 }

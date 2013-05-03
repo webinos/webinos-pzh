@@ -39,7 +39,7 @@ module.exports = function (app, address, port, authConfig) {
         res.redirect('/');
     });
     
-    // todo : finish selecting for authentication methods that are enabled.
+
     if (authConfig.facebook.enabled) {
         
         app.get(authConfig.facebook.authpath, 
@@ -51,6 +51,15 @@ module.exports = function (app, address, port, authConfig) {
         // made the decision NOT to request email address: we're just going to make it
         // based on the user name and @facebook.com.  Reason - otherwise people can
         // assert any email address, we lose connection with the provider.
+    }
+
+    if (authConfig.twitter.enabled) {
+        
+        app.get(authConfig.twitter.authpath, 
+            passport.authenticate('twitter', { successRedirect: '/',
+                                                failureRedirect: '/login' }));
+        
+        app.get('/auth/twitter', passport.authenticate('twitter'));
     }
     
     if (authConfig.google.enabled) {
