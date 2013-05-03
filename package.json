@@ -1,4 +1,4 @@
-{ "name": "pzh",
+{ "name": "webinos-pzh",
   "version": "0.1.0",
   "description": "Webinos server side functionality",
   "main": "./lib/pzh_sessionHandling.js",
