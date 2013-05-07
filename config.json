@@ -1,13 +1,13 @@
 { "authentication" :
     { "facebook" : 
-      { "clientID"     : "452158721534643"
-      , "clientSecret" : "91da4f2d2415f091f2bf619abcd7947b"
-      , "callbackURL"  : "https://pzh.johnlyle.com:6443/auth/facebook/callback"
+      { "clientID"       : ""
+      , "clientSecret"   : ""
+      , "callbackURL"    : ""
       }
     , "twitter" :
-      { "consumerKey" : "a4jg9EYsFmpgojy0jODdlw"
-      , "consumerSecret" : "CnFSEe5QLQlcujEyvqIQlc745d01DMIj9OjqOyc7E"
-      , "callbackURL" : "https://pzh.johnlyle.com:6443/auth/twitter/callback"
+      { "consumerKey"    : ""
+      , "consumerSecret" : ""
+      , "callbackURL"    : ""
       }
     } 
 }
