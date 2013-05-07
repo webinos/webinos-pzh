@@ -1,35 +1,52 @@
 !!! 5
 html
   head
+    - if (isExternal) {
+    title Please login to access #{internalUser}'s personal zone hub
+    - } else {
     title PZH Login
-
+    - }
     link(rel="stylesheet", type="text/css", href="/css/reset.css")
     link(rel="stylesheet", type="text/css", href="/css/structure.css")
     link(rel="stylesheet", type="text/css", href="/css/login.css")
 
-    script
-      function loginGoogle() {
-        window.location.href = "./auth/google";
-      }
-      function loginYahoo() {
-        window.location.href = "./auth/yahoo";
-      }
+    script(type="text/javascript", src="/js/view-login.js")
 
   body
     form.box.login
       header
         img(src="http://webinos.org/wp-content/themes/parallelus-unite/images/webinos_logo.png", width="100px")
+        - if (isExternal) {
+        label Connect to #{internalUser}
+        - } else if (isPzp) {
+        label Request access to this zone: login
+        - } else {
         label Personal Zone Hub login
+        - }
         // <label>Please login to you personal zone hub using one of the following methods.</label>
         // TODO: "If you do not have an account, click..."
         // TODO: Fix stylesheet so that addition text can be added here if necessary
       fieldset.boxBody
+        - if (auth.google.enabled) {
         label Login using your Google ID
         img(src='https://ssl.gstatic.com/images/logos/google_logo_41.png', width="100px")
         input(type="button", class="btnLogin", onclick="loginGoogle()", value="Login via Google")
+        - }
+        - if (auth.yahoo.enabled) {
         label Login using your Yahoo! ID
         img(src='http://l.yimg.com/a/images/ww/met/slimheader/yahoo-logo-sm-png8.png', width="100px")
         input(type="button", class="btnLogin", onclick="loginYahoo()", value="Login via Yahoo!")
+        - }
+        - if (auth.facebook.enabled) {
+        label Login using your Facebook ID
+        img(src='http://cav2013.forsyte.at/files/facebook-logo.jpg', width="100px")
+        input(type="button", class="btnLogin", onclick="loginFacebook()", value="Login via Facebook")
+        - }
+        - if (auth.twitter.enabled) {
+        label Login using your Twitter ID
+        img(src='https://twitter.com/images/resources/twitter-bird-light-bgs.png', height="45px")
+        input(type="button", class="btnLogin", onclick="loginTwitter()", value="Login via Twitter")
+        - }        
     footer#main
       a(href="http://www.webinos.org") Powered by webinos
       |  |

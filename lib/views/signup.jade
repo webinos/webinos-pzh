@@ -1,0 +1,19 @@
+!!! 5
+html
+  head
+    title PZH Login
+    link(rel="stylesheet", type="text/css", href="/css/reset.css")
+    link(rel="stylesheet", type="text/css", href="/css/structure.css")
+    link(rel="stylesheet", type="text/css", href="/css/login.css")    
+  body
+    form.box.login(action="/createPzh", method="POST")
+      header
+        img(src="http://webinos.org/wp-content/themes/parallelus-unite/images/webinos_logo.png", width="100px")
+        label Register for a Personal Zone Hub
+      fieldset.boxBody
+        label Sign up to create your own Personal Zone Hub
+        input(type="submit", class="btnLogin", value="Sign up!")
+    footer#main
+      a(href="http://www.webinos.org") Powered by webinos
+      |  |
+      a(href="http://developer.webinos.org")  Developer resources on webinos
