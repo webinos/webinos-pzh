@@ -22,6 +22,6 @@
     "zombie": "~2.0.0-alpha17"
   },
   "scripts" : {
-    "travis-test": "./test/with-pzh-running/run/sh"
+    "travis-test": "./test/with-pzh-running/run.sh"
   }
 }
