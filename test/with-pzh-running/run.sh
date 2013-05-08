@@ -48,8 +48,8 @@ echo "Cloned the PZH into $WEBINOS_PZH_DIR "
 
 
 # set the ports on the PZH
-sed -i 's/\(\s*"provider"\s*:\)\s*[0-9]*,/\16080,/' ./config.json
-sed -i 's/\(\s*"provider_webServer"\s*:\s*\)[0-9]*,/\16443,/' ./config.json
+sed -i 's/\(\s*"provider"\s*:\)\s*[0-9]*,/\16080,/' $WEBINOS_PZH_DIR/config.json
+sed -i 's/\(\s*"provider_webServer"\s*:\s*\)[0-9]*/\16443/' $WEBINOS_PZH_DIR/config.json
 
 
 # install the PZH and save dependencies
