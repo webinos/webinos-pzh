@@ -31,7 +31,7 @@ body {
 }
 
 .box.login {
-    height: 420px;
+    /*height: 500px;*/
     width: 400px;
     position: absolute;
     left: 50%;
