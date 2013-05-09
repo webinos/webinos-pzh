@@ -6,8 +6,8 @@
   "author": "Habib Virji  <habib.virji@samsung.com>, John Lyle",
   "homepage": "http://www.webinos.org",
   "bugs": "http://jira.webinos.org",
-  "repositories":
-  { "type": "git",
+  "repositories": {
+    "type": "git",
     "url": "git://github.com/webinos/webinos-pzhWebServer.git"
   },
   "dependencies": {
@@ -22,7 +22,11 @@
     "webinos-utilities"  : "git://github.com/webinos/webinos-utilities.git",
     "webinos-certificateHandler": "git://github.com/webinos/webinos-certificateHandler.git",
     "openid": "0.x.x"
+  },
+  "devDependencies": {
+    "zombie": "~2.0.0-alpha17"
+  },
+  "scripts" : {
+    "travis-test": "./test/with-pzh-running/run.sh"
   }
 }
-
-
