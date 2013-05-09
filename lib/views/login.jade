@@ -46,7 +46,13 @@ html
         label Login using your Twitter ID
         img(src='https://twitter.com/images/resources/twitter-bird-light-bgs.png', height="45px")
         input(type="button", class="btnLogin", onclick="loginTwitter()", value="Login via Twitter")
-        - }        
+        - }
+        - if (auth.openid.enabled) {
+        label Login using OpenID (please enter your identifier)
+        img(src='http://openid.net/wordpress-content/themes/openid/images/logo_openid.png', width="100px")
+        input(type="text", name="openid_identifier", id="openid_identifier")
+        input(type="button", class="btnLogin", onclick="loginOpenID()", value="Login via OpenID")
+        - }
     footer#main
       a(href="http://www.webinos.org") Powered by webinos
       |  |

@@ -1,13 +1,24 @@
 { "authentication" :
-    { "facebook" : 
-      { "clientID"       : ""
+    { "google" :
+      { "enabled"        : true
+      }
+    , "yahoo" :
+      { "enabled"        : true
+      }
+    , "openid" : 
+      { "enabled"        : false 
+      }
+    , "facebook" : 
+      { "enabled"        : false
+      , "clientID"       : ""
       , "clientSecret"   : ""
       , "callbackURL"    : ""
       }
     , "twitter" :
-      { "consumerKey"    : ""
+      { "enabled"        : false
+      , "consumerKey"    : ""
       , "consumerSecret" : ""
       , "callbackURL"    : ""
       }
-    } 
+    }
 }
