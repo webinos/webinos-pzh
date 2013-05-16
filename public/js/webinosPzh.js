@@ -44,7 +44,7 @@ var webinosPZH = {
         if (urlArgs.length >= 2) payload.from = urlArgs[2];
         webinosPZH.channel = new XMLHttpRequest();
         webinosPZH.channel.onreadystatechange = webinosPZH.messageReceived;
-        var queryUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + "query/";
+        var queryUrl = window.location.protocol + "//" + window.location.host + "/query";
         webinosPZH.channel.open("POST", queryUrl);
         webinosPZH.channel.setRequestHeader("Content-Type", "application/json");
         webinosPZH.channel.send(JSON.stringify(payload));

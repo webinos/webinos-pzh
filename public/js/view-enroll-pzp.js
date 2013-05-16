@@ -29,7 +29,7 @@ channel.onmessage = function (message) {
 				}
 			 }
 		 }
-		 req.open("POST", window.location.protocol + "//" + window.location.host + "/main/"+templateData.user+"/pzpEnroll/");
+		 req.open("POST", window.location.protocol + "//" + window.location.host + "/pzpEnroll");
 		 req.setRequestHeader ("Content-Type", "application/json");
 		 req.send(JSON.stringify({authCode:data.payload.authCode, csr:data.payload.csr, from:data.from}));
 	}
