@@ -45,32 +45,40 @@ function setApproveUserVisibility(next) {
 function pzhList(payload) {
 	var text = "";
 	if (payload.length !== 0) {
-	  text = "Connect to personal zone(inside same provider):<br/> <select id='pzh_list'>"
-	  for (var i = 0; i < payload.length; i = i +1) {
-		text += "<option value="+payload[i].url+">"+ payload[i].username + " (" + payload[i].email + ")</option>";
-	  }
+	  text += "<form action=\"/connect-friend-local\" method=\"post\">";
+	  text += "<fieldset id=\"connect-local-friend\" class=\"connect-fieldset\">";
+	  text += "<legend>Connect to a personal zone at this website</legend>";
+	  text += "<select id='pzh_list' name='email'>"
+    for (var i = 0; i < payload.length; i = i +1) {
+      text += "<option value="+payload[i].email+">"+ payload[i].username + " (" + payload[i].email + ")</option>";
+    }
 	  text += "</select>";
-	  text += "<input type='button' onclick='connectPzh()' value='Connect Pzh'/>";
-	  text += "<p></p> <p> or Enter Details Manually</p>"
+    text += "<input type='submit' value='Connect Pzh'/>";
+	  text += "</fieldset></form>";
 	}
-	text += "<input type='text' id='connectPzhId' value=''/>";
-	text += "<input type='button' onclick='connectPzh_manual()' value='Connect Pzh'/>";
-	text += "<p>The address should be of of form hostname/email eg: pzh.webinos.org/bob@gmail.com</p>";
+  text += "<form action=\"connect-friend\" method=\"post\">";
+  text += "<fieldset id=\"connect-friend\" class=\"connect-fieldset\">";
+  text += "<legend>Enter details manually</legend>";
+  text += "<dl>";
+    text += "<dt>";
+      text += "<label>Personal zone hub address (e.g., pzh.webinos.org)</label>";
+    text += "</dt>";
+    text += "<dt>";
+	    text += "<input type='text' name='pzhaddress' id='connectPzhId' value=''/>";
+    text += "</dt>";
+    text += "<dt>";
+      text += "<label>Email address (e.g., alice@foo.com)</label>";
+    text += "</dt>";
+    text += "<dt>";
+	    text += "<input type='text' name='email' id='connectPzhEmail' value=''/>";
+    text += "</dt>";
+    text += "<dt>";
+	    text += "<input type='submit' value='Connect Pzh'/>";
+    text += "</dt>";
+  text += "</dl>";	
+	text += "</fieldset></form>";
 
 	setArticle("Connect to another personal zone",text);
-}
-function connectPzh(){
-	var e = document.getElementById('pzh_list');
-	var id = e.options[e.selectedIndex].value;
-	id = id.substring(id.indexOf("_")+1, id.length);
-	window.location.href = "./connect-friend-local?externalemail=" + encodeURIComponent(id);
-}
-function connectPzh_manual() {
-	var e = document.getElementById('connectPzhId').value;
-	if (e) {
-	  e = e.split("/");
-	  window.location.href = "./connect-friend?externalemail=" + encodeURIComponent(e[1]) + "&externalpzh=" + encodeURIComponent(e[0]);
-	}
 }
 function removePzh(payload) {
 	console.log(payload)

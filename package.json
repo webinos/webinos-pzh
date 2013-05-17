@@ -21,7 +21,8 @@
     "jade": "*",
     "webinos-utilities"  : "git://github.com/webinos/webinos-utilities.git",
     "webinos-certificateHandler": "git://github.com/webinos/webinos-certificateHandler.git",
-    "openid": "0.x.x"
+    "openid": "0.x.x",
+    "express-validator":"0.3.x"
   },
   "devDependencies": {
     "zombie": "~2.0.0-alpha17"
