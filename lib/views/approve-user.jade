@@ -22,7 +22,7 @@ html
         h1#newUserReqName #{externalUser}
         h2 would like to connect with you.
       div#newUserReqButtons.permissions-controls
-      form#newUserReqForm(name="approve-user", action="../../make-user-decision/", method="post")
+      form#newUserReqForm(name="approve-user", action="/make-user-decision", method="post")
         input(type="hidden", value="#{externalUser}", name="useremail")
         input(type="checkbox", name="decision", value="approve") Approve
       div#newUserReqContinue.button Continue

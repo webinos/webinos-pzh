@@ -190,6 +190,10 @@ min-height: 500px;
 margin-top: -4px;
 }
 
+#approveUserCount {
+  color: red;
+}
+
 #sidebar hr {
 border: none;
 outline: none;

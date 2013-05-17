@@ -27,6 +27,21 @@ function setArticle(header,body){
 	$('#main').html('<article class="module width_full"><header><h3>' + header + '</h3></header><div class="module_content">'+ body + '</div></article><div class="spacer"></div>');
 	$('.column').equalHeight(); // Fix height
 }
+function setApproveUserVisibility(next) {
+  webinosPZH.commands.approveUser(function(payload) {
+    console.log("Approve User? " + JSON.stringify(payload));
+    if (payload.length === 0) {
+      document.getElementById('approveUser').style.display='none';
+    } else if (payload.length > 0) {
+      document.getElementById('approveUser').style.display='inline-block';
+      document.getElementById('approveUserCount').innerHTML = payload.length + " ";
+    }
+    if (next) {
+      next();
+    }
+  });
+  return;
+}
 function pzhList(payload) {
 	var text = "";
 	if (payload.length !== 0) {
@@ -124,7 +139,7 @@ function approveUser(payload) {
 	var text = "";
 	if (payload) {
 	  text = "<h3>Would you like to approve or reject the request?</h3>";
-	  text += "<p><form name='approve-user' action='/main/"+userPath+"/make-user-decision/' method='post'> <table>";
+	  text += "<p><form name='approve-user' action='/make-user-decision' method='post'> <table>";
 	  for (var i = 0; i < payload.length; i = i+1) {
 		text += "<tr> <td> <input type='checkbox' name='decision' value="+payload[i].name+">";
 		text += payload[i].name+"</input></td>";
@@ -139,6 +154,7 @@ function approveUser(payload) {
 	setArticle("Approve User List", text);
 }
 function listUserDetails(payload){
+  console.log("List user details: " + JSON.stringify(payload));
 	var text = "";
 	if (!payload) {
 	  payload = {
@@ -155,12 +171,22 @@ function listUserDetails(payload){
 	$("#userId").html(payload.name);
 	webinosPZH.commands.getZoneStatus(DisplayListOfDevices);
 }
+function startUpFunctions() {
+  webinosPZH.commands.getZoneStatus(function(payload) {
+    DisplayListOfDevices(payload);
+    webinosPZH.commands.getUserDetails(function(payload2) {
+        listUserDetails(payload2);
+        setApproveUserVisibility(); 
+    });
+  });
+}
+
 $(document).ready(function() {
 	webinosPZH.init(function(){
-	  webinosPZH.commands.getUserDetails(listUserDetails);
 	  setTimeout(function() {
-		webinosPZH.commands.getZoneStatus(DisplayListOfDevices);
+		  webinosPZH.commands.getZoneStatus(DisplayListOfDevices);
 	  }, 3000);
+	  startUpFunctions();	  
 	});
 	$("#connectPzh").click(function(){
 	  webinosPZH.commands.getAllPzh(pzhList);

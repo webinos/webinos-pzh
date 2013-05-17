@@ -65,7 +65,7 @@ describe("The PZH Web Server", function() {
 
     runs(function() {
       browser.
-        visit(pzhwsPath + "main/user%40example.com/").
+        visit(pzhwsPath + "home").
         then(function() {
           var document = browser.document;    
           finished = true;
