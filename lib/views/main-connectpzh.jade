@@ -1,0 +1,28 @@
+extends main
+
+block content
+  -if (pzhlist.length !== 0) {
+    form(action="connect-friend-local", method="post")
+      fieldset#connect-local-friend.connect-fieldset
+        legend Connect to a personal zone at this website
+        select#pzh_list(name='email')
+          - for (var i = 0; i < pzhlist.length; i = i +1) {
+            option(value="#{pzhlist[i].email}") #{pzhlist[i].username} ( #{pzhlist[i].email} )      
+          - }
+        input(type='hidden', name='_csrf', value='#{_csrf}')
+        input(type='submit',value='Connect Pzh')
+  -}
+    form(action="connect-friend", method="post")
+      fieldset#connect-friend.connect-fieldset
+        legend Enter details manually
+        dl
+          dt
+            label Personal zone hub address (e.g., pzh.webinos.org)
+          dt
+            input#connectPzhId(type='text', name='pzhaddress', value='')
+          dt
+            label Email address (e.g., alice@foo.com)
+          dt
+            input#connectPzhId(type='text', name='email', value='')
+          dt
+            input(type='submit', value='Connect Pzh')

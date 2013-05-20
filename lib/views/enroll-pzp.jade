@@ -1,19 +1,20 @@
-!!! 5
-html
-  head
-    title PZP Enrollment
-    script(type="text/javascript")
-      var templateData = {};
-      templateData.user = "#{user}";
-      templateData.pzpPort = "#{pzpPort}";
-      templateData.authCode = "#{authCode}";
-      templateData.port = "#{port}";
-      templateData.address = "#{address}";
-    script(src="/js/view-enroll-pzp.js", type="text/javascript")
-  body
-    h1 Currently your device is being enrolled at the PZH...
-    span Please hold you will redirected automatically to your PZP
-    footer#main
-      a(href="http://www.webinos.org") Powered by webinos
-      |  |
-      a(href="http://developer.webinos.org")  Developer resources on webinos
+extends main
+
+block append scripts
+  script(src="/js/view-enroll-pzp.js", type="text/javascript")
+  script(src="/js/go-home.js", type="text/javascript")
+
+block header
+  h3 Enrol new device into your personal zone
+
+block content
+  p  
+    | Are you sure that you want to enrol the device you are currently using into
+    | your personal zone ( #{user.emails[0].value} ) ?
+  p 
+    | This device will be given full access to all other parts of your personal
+    | zone, including files, your location information and your application data.
+  // pzpPort, authcode, user, pzhPort, pzhAddress, csrf
+  input(type="button", onclick="enrol(#{pzpPort}, '#{authCode}', '#{user.emails[0].value}', #{port}, '#{address}', '#{_csrf}' )", value="Yes, please enrol this device")
+  input(type="button", onclick="goHome()", value="No, thanks.")
+  input(type="button", onclick="goHome()", value="I'm not sure what's going on")}

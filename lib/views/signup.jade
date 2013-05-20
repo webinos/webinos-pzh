@@ -12,6 +12,7 @@ html
         label Register for a Personal Zone Hub
       fieldset.boxBody
         label Sign up to create your own Personal Zone Hub
+        input(type='hidden', name='_csrf', value='#{_csrf}')
         input(type="submit", class="btnLogin", value="Sign up!")
     footer#main
       a(href="http://www.webinos.org") Powered by webinos

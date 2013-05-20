@@ -1,0 +1,8 @@
+extends main
+
+block content
+  h3 Name: #{profile.displayName}
+  h3 Email: #{profile.emails[0].value}
+  - if (profile.photoUrl) {
+    img(src="#{photoUrl}", width='100px')
+  - }
