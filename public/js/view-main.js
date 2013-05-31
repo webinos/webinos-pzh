@@ -4,6 +4,7 @@ function DisplayListOfDevices(payload){
 	var text = "";
 	if(payload && payload.pzhs) {
 	  for (var i = 0 ; i < payload.pzhs.length; i += 1){
+	  console.log(JSON.stringify(payload.pzhs));
 		var style = payload.pzhs[i].isConnected?"connected":"disconnected";
 		if (payload.pzhs[i].id.search("Your Pzh") === -1 ) {
 	      text +='<li><input type="image" src="/images/removePzh.jpg" id="payload.pzhs[i].id" height="15" width="15"'+

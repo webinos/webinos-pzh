@@ -5,9 +5,9 @@ block content
     form(action="connect-friend-local", method="post")
       fieldset#connect-local-friend.connect-fieldset
         legend Connect to a personal zone at this website
-        select#pzh_list(name='email')
+        select#pzh_list(name='nickname')
           - for (var i = 0; i < pzhlist.length; i = i +1) {
-            option(value="#{pzhlist[i].email}") #{pzhlist[i].username} ( #{pzhlist[i].email} )      
+            option(value="#{pzhlist[i].nickname}") #{pzhlist[i].username} ( #{pzhlist[i].nickname} )      
           - }
         input(type='hidden', name='_csrf', value='#{_csrf}')
         input(type='submit',value='Connect Pzh')
@@ -21,8 +21,8 @@ block content
           dt
             input#connectPzhId(type='text', name='pzhaddress', value='')
           dt
-            label Email address (e.g., alice@foo.com)
+            label Nickname (e.g., 'alice')
           dt
-            input#connectPzhId(type='text', name='email', value='')
+            input#connectPzhId(type='text', name='nickname', value='')
           dt
             input(type='submit', value='Connect Pzh')
