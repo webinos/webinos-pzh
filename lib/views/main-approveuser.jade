@@ -8,8 +8,8 @@ block content
         dl
           - for(var i = 0; i < waiting.length; i++) {
             dt
-              input(type='checkbox', name='decision', value='#{waiting[i].name}') 
-              | #{waiting[i].name} - hosted at <a href="https://#{waiting[i].host}">#{waiting[i].host}</a>.  
+              input(type='checkbox', name='decision', value='#{waiting[i].id}') 
+              | #{waiting[i].email} (#{waiting[i].displayName}) - hosted at <a href="https://#{waiting[i].host}">#{waiting[i].host}</a>.  
           -}
           dt
             div.spacer
