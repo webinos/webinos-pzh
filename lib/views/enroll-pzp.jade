@@ -15,6 +15,6 @@ block content
     | This device will be given full access to all other parts of your personal
     | zone, including files, your location information and your application data.
   // pzpPort, authcode, user, pzhPort, pzhAddress, csrf
-  input(type="button", onclick="enrol(#{pzpPort}, '#{authCode}', '#{user.emails[0].value}', #{port}, '#{address}', '#{_csrf}' )", value="Yes, please enrol this device")
+  input(type="button", onclick="enrol(#{pzpPort}, '#{user.emails[0].value}', #{port}, '#{address}', '#{_csrf}' )", value="Yes, please enrol this device")
   input(type="button", onclick="goHome()", value="No, thanks.")
   input(type="button", onclick="goHome()", value="I'm not sure what's going on")}
