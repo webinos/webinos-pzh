@@ -1,9 +1,9 @@
 {
   "name": "webinos-pzhWebServer",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Webinos cloud functionality is implemented in PZH WebServer",
   "main": "./lib/startweb.js",
-  "author": "Habib Virji  <habib.virji@samsung.com>, John Lyle",
+  "author": "Habib Virji  <habib.virji@samsung.com>, John Lyle <john.lyle@cs.ox.ac.uk>",
   "homepage": "http://www.webinos.org",
   "bugs": "http://jira.webinos.org",
   "repositories": {
