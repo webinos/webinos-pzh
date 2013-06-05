@@ -1,12 +1,15 @@
 { "authentication" :
     { "google" :
       { "enabled"        : true
+      , "callbackURL"    : ""
       }
     , "yahoo" :
       { "enabled"        : true
+      , "callbackURL"    : ""
       }
     , "openid" : 
-      { "enabled"        : false 
+      { "enabled"        : false
+      , "callbackURL"    : "" 
       }
     , "facebook" : 
       { "enabled"        : false
