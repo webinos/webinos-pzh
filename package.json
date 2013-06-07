@@ -28,5 +28,8 @@
   "preferGlobal": true,
   "bin": {
     "webinos_pzh": "webinos_pzh.js"
+  },
+  "scripts":{
+    "travis-test": "./test/travis-test.sh"
   }
 }
