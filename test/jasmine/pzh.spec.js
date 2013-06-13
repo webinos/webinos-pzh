@@ -44,7 +44,6 @@ function createPzh(pzhConnection, email, displayName) {
 function connectProvider(callback) {
     wUtil.webinosHostname.getHostName("", function (address) {
         pzhAddress= address;
-        console.log(providerPort, pzhAddress, pzhWebCertificates);
         var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,
         function () {
             expect(pzhConnection.authorized).toEqual(true);
@@ -52,7 +51,9 @@ function connectProvider(callback) {
             pzhConnection.on("data", function (_buffer) {
                 wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
                     if(obj.payload && obj.payload.type && obj.payload.type === "addPzh") {
+                       expect(obj.payload.message).toContain(user.emails[0].value);
                        callback(true);
+                       pzhConnection.socket.end();
                     }
                 });
             });
@@ -72,4 +73,208 @@ describe("connect pzh provider and create pzh", function(){
        }
     }, 3000);
 });
+
+describe("test web api of PZH", function(){
+    var user = {
+        emails: [{value:"hello0@webinos.org"}],
+        displayName: "Hello#0",
+        from: "google"
+    };
+    it("get user data", function(done){
+       var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,function(){
+           expect(pzhConnection.authorized).toEqual(true);
+           pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "getUserDetails"}})));
+           pzhConnection.on("data", function (_buffer) {
+               wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                   if(obj.payload && obj.payload.type && obj.payload.type === "getUserDetails") {
+                       expect(obj.payload.message.authenticator).toEqual(user.from);
+                       expect(obj.payload.message.name).toEqual(user.displayName);
+                       expect(obj.payload.message.email).toEqual(user.emails);
+                       pzhConnection.socket.end();
+                       done();
+                   }
+               });
+           });
+       });
+    });
+
+    it("get connected details", function(done){
+        var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,function(){
+            expect(pzhConnection.authorized).toEqual(true);
+            pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "getZoneStatus"}})));
+            pzhConnection.on("data", function (_buffer) {
+                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                    if(obj.payload && obj.payload.type && obj.payload.type === "getZoneStatus") {
+                        expect(obj.payload.message.pzps).toEqual([]);
+                        expect(obj.payload.message.pzhs[0].id).toEqual(user.displayName+" (Your Pzh)");
+                        expect(obj.payload.message.pzhs[0].url).toContain(user.emails[0].value);
+                        expect(obj.payload.message.pzhs[0].isConnected).toBeTruthy();
+                        pzhConnection.socket.end();
+                        done();
+                    }
+                });
+            });
+        });
+    });
+
+    it("get logs", function(done){
+        var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,function(){
+            expect(pzhConnection.authorized).toEqual(true);
+            pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "getCrashLog"}})));
+            pzhConnection.on("data", function (_buffer) {
+                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                    if(obj.payload && obj.payload.type && obj.payload.type === "getCrashLog") {
+                        expect(obj.payload.message).not.toBeNull();
+                        pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "getInfoLog"}})));
+                    } else if(obj.payload && obj.payload.type && obj.payload.type === "getInfoLog") {
+                        expect(obj.payload.message).not.toBeNull();
+                        pzhConnection.socket.end();
+                        done();
+                    }
+                });
+            });
+        });
+    });
+
+    it("get pzps", function(done){
+        var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,function(){
+            expect(pzhConnection.authorized).toEqual(true);
+            pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "getPzps"}})));
+            pzhConnection.on("data", function (_buffer) {
+                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                    if(obj.payload && obj.payload.type && obj.payload.type === "getPzps") {
+                        expect(obj.payload.message.revokedCert).toEqual([]);
+                        expect(obj.payload.message.signedCert).toEqual([]);
+                        pzhConnection.socket.end();
+                        done();
+                    }
+                });
+            });
+        });
+    });
+
+    it("enroll PZP", function(done){
+        var webinosMetaData = {
+            webinosRoot: webinosPath,
+            webinosType: "Pzp",
+            serverName: "0.0.0.0",
+            webinosName: "machine0"
+        };
+        var cert = require("webinos-certificateHandler");
+        var certificateInstance = new cert(webinosMetaData);
+        certificateInstance.generateSelfSignedCertificate("PzpCA", "PzpCA:machine0");
+        var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,function(){
+            expect(pzhConnection.authorized).toEqual(true);
+            pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "csrAuthCodeByPzp",
+                from: webinosMetaData.webinosName, csr: certificateInstance.internal.master.csr, friendlyName: "Test"}})));
+            pzhConnection.on("data", function (_buffer) {
+                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                    if(obj.payload && obj.payload.type && obj.payload.type === "csrAuthCodeByPzp") {
+                        expect(obj.payload.message.from).toContain(user.emails[0].value);
+                        expect(obj.payload.message.to).toContain(webinosMetaData.webinosName);
+                        expect(obj.payload.message.payload.message.clientCert).not.toBeNull();
+                        expect(obj.payload.message.payload.message.masterCert).not.toBeNull();
+                        expect(obj.payload.message.payload.message.masterCrl).not.toBeNull();
+                        expect(obj.payload.message.payload.message.friendlyName).toEqual(user.displayName)
+                        pzhConnection.socket.end();
+                        done();
+                    }
+                });
+            });
+        });
+    });
+
+
+    it("list services", function(done){
+        var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,function(){
+            expect(pzhConnection.authorized).toEqual(true);
+            pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "listAllServices"}})));
+            pzhConnection.on("data", function (_buffer) {
+                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                    if(obj.payload && obj.payload.type && obj.payload.type === "listAllServices") {
+                        expect(obj.payload.message.pzEntityList[0].pzId).toContain(user.emails[0].value);
+                        expect(obj.payload.message.services[0].serviceAddress).toContain(user.emails[0].value);
+                        expect(obj.payload.message.services[1].serviceAddress).toContain(user.emails[0].value);
+                        expect(obj.payload.message.services[2].serviceAddress).toContain(user.emails[0].value);
+                        pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user,
+                            message: {type: "listUnregServices", at: pzhAddress+":"+providerWebServer+"_"+user.emails[0].value}})));
+                    } else if(obj.payload && obj.payload.type && obj.payload.type === "listUnregServices") {
+                        expect(obj.payload.message.pzEntityId).toContain(user.emails[0].value);
+                        expect(obj.payload.message.modules).not.toBeNull();
+                        pzhConnection.socket.end();
+                        done();
+                    }
+                });
+            });
+        });
+    });
+    it("get all pzhs", function(done){
+        var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,function(){
+            expect(pzhConnection.authorized).toEqual(true);
+            pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "getAllPzh"}})));
+            pzhConnection.on("data", function (_buffer) {
+                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                    if(obj.payload && obj.payload.type && obj.payload.type === "getAllPzh") {
+                        expect(obj.payload.message).toEqual([]);
+                        done();
+                    }
+                });
+            });
+        });
+    });
+    /*it("register and un-register service", function(done){
+        var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,function(){
+            expect(pzhConnection.authorized).toEqual(true);
+            pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "registerService",
+                at:pzhAddress+":"+providerWebServer+"_"+user.emails[0].value , name: "webinos-api-test"}})));
+            pzhConnection.on("data", function (_buffer) {
+                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                    if(obj.payload && obj.payload.type && obj.payload.type === "registerService") {
+                        console.log(obj.payload.message);
+                        pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "unregisterService"}})));
+                    } else if(obj.payload && obj.payload.type && obj.payload.type === "unregisterService") {
+                        console.log(obj.payload.message);
+                        pzhConnection.socket.end();
+                        done();
+                    }
+                });
+            });
+        });
+    }); */
+
+    it("revokePzp", function(done){
+        var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,function(){
+            expect(pzhConnection.authorized).toEqual(true);
+
+            pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "revokePzp", pzpid:pzhAddress+":"+providerWebServer+"_"+user.emails[0].value+"/machine0"}})));
+            pzhConnection.on("data", function (_buffer) {
+                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                    if(obj.payload && obj.payload.type && obj.payload.type === "revokePzp") {
+                        expect(obj.payload.message).toBeTruthy();
+                        done();
+                    }
+                });
+            });
+        });
+    });
+
+    it("remove pzh", function(done){
+        var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,function(){
+            expect(pzhConnection.authorized).toEqual(true);
+            pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "removePzh", id:pzhAddress+":"+providerWebServer+"_"+user.emails[0].value }})));
+            pzhConnection.on("data", function (_buffer) {
+                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                    if(obj.payload && obj.payload.type && obj.payload.type === "removePzh") {
+                        console.log(obj.payload.message);
+                        pzhConnection.socket.end();
+                        //    "revokePzp"             :revokePzp,  "csrAuthCodeByPzp"      :csrAuthCodeByPzp,
+                        done();
+                    }
+                });
+            });
+        });
+    });
+    // not repeating pzh certificate exchange as handled in pzp
+});
+
 
