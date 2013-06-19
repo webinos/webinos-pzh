@@ -346,7 +346,40 @@ background: #F1F1F4 url(../images/module_footer_bg.png) repeat-x;
 
 .module_content {
 margin: 10px 20px;
-color: #666;}
+color: #666;
+}
+
+.module_content .pzptable {
+
+  border: 1px solid #9CA1B0;
+  width: 80%;
+  
+}
+
+.module_content .connect-fieldset {
+  border: none;
+  padding-bottom: 15px;
+}
+
+.module_content .connect-fieldset legend {
+  font-size:14px; 
+  font-weight: bold;
+  padding-top: 10px;
+}
+
+.module_content .connect-fieldset dl {
+  margin-top: 0px;
+  padding-top: 0px;
+}
+
+.module_content .connect-fieldset label {
+  font-size:10px;
+}
+
+.hidden {
+  display:none;
+}
+
 
 /* Module Widths */
 

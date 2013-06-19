@@ -1,0 +1,17 @@
+extends main
+
+block content
+  form(name='approve-user', action='/make-user-decision', method='post')
+    fieldset#approve-user.connect-fieldset  
+      legend Would you like to give the following users access to your personal devices?
+        div.spacer
+        dl
+          - for(var i = 0; i < waiting.length; i++) {
+            dt
+              input(type='checkbox', name='decision', value='#{waiting[i].id}') 
+              | #{waiting[i].email} (#{waiting[i].displayName}) - hosted at <a href="https://#{waiting[i].host}">#{waiting[i].host}</a>.  
+          -}
+          dt
+            div.spacer
+            input(type='submit', value='Submit')
+    input(type='hidden', name='_csrf', value='#{_csrf}')

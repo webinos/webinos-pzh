@@ -1,12 +1,15 @@
 { "authentication" :
     { "google" :
       { "enabled"        : true
+      , "callbackURL"    : ""
       }
     , "yahoo" :
       { "enabled"        : true
+      , "callbackURL"    : ""
       }
     , "openid" : 
-      { "enabled"        : false 
+      { "enabled"        : false
+      , "callbackURL"    : "" 
       }
     , "facebook" : 
       { "enabled"        : false
@@ -19,6 +22,15 @@
       , "consumerKey"    : ""
       , "consumerSecret" : ""
       , "callbackURL"    : ""
+      }
+    }
+, "csp" :
+    { "defaultPolicy": 
+      { "default-src" : ["'self'"]
+      , "connect-src" : "*"
+      , "script-src"  : ["'self'", "https://ajax.googleapis.com", "'unsafe-inline'"]
+      , "style-src"   : ["'self'", "'unsafe-inline'"]
+      , "img-src"   : ["'self'", "https://ssl.gstatic.com", "http://webinos.org", "http://www.webinos.org", "http://l.yimg.com", "https://twitter.com", "http://cav2013.forsyte.at", "http://openid.net"]
       }
     }
 }

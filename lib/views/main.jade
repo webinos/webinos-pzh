@@ -7,14 +7,16 @@ html
     link(rel="stylesheet", href="/css/layout.css", type="text/css", media="screen")
     //if lt IE 9
       link(rel="stylesheet", href="css/ie.css", type="text/css", media="screen")
-      script(src="http://html5shim.googlecode.com/svn/trunk/html5.js")
-    script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js", type="text/javascript")
-    script(src="/js/hideshow.js", type="text/javascript")
-    script(src="/js/jquery.equalHeight.js", type="text/javascript")
-    script(type="text/javascript")
-      var userPath = "#{user}";
-    script(src="/js/view-main.js", type="text/javascript")
+    block scripts
+      script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js", type="text/javascript")
+      script(src="/js/hideshow.js", type="text/javascript")
+      script(src="/js/jquery.equalHeight.js", type="text/javascript")
+      script(src="/js/view-main.js", type="text/javascript")
   body
+    #anticsrf.hidden
+      - if (typeof _csrf !== 'undefined') {
+          | #{_csrf}
+      - }
     header#header
       hgroup
         h1.site_title
@@ -27,7 +29,7 @@ html
 
     section#secondary_bar
       div.user
-        p#userId Connecting...
+        p#userId #{profile.displayName}
       div.breadcrumbs_container
         article.breadcrumbs
           a(href="/") webinos personal zone hub
@@ -41,21 +43,18 @@ html
       h3 Connected personal zones
       ul#enumConnectedPzh(style="display: block;")
       ul#connectToAnotherPZHLink
-        li: a#connectPzh(href="#connectPzh") Connect to another personal zone...
-        li: a#approveUser(href="#approveUser") 
+        li: a#connectPzh(href="/connectPzh") Connect to another personal zone...
+        li: a#approveUser(href="/approveUser") 
           span#approveUserCount 0
           span#approveUserAfterText User waiting for approval...
       h3 Connected devices
       ul#enumConnectedPzp(style="display: block;")
       ul
-        li: a#revokeCert(href="#revokeCert") Remove a device...
+        li: a#revokeCert(href="/revokePzp") Remove a device...
       h3 Personal zone admin
       ul
-        li: a#userDetails(href="#userDetails") About you
-        li: a#serviceConfig(href="#serviceConfig") Service configuration
-        li: a#restartPzh(href="#restartPzh") Restart the personal zone hub
-        li: a#crashLog(href="#crashLog") Crash log
-        li: a#infoLog(href="#infoLog") Info log
+        li: a#userDetails(href="/home") About you
+        li: a#serviceConfig(href="/services") Service configuration
 
       footer
         hr
@@ -68,8 +67,9 @@ html
     section#main.column
       article.module.width_full
         header
-          h3 webinos personal zone hub
-          div.module_content
-            p Please select one of the actions on the left menu
+          block header
+            h3#mainheader webinos personal zone hub
+        div.module_content#maincontent
+          block content
       // end of styles article
       div.spacer

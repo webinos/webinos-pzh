@@ -1,13 +1,9 @@
 var webinosPZH = {
+    getNextId: function() {
+        return Math.floor(Math.random() * 100000);
+    },
     channel:null,
     provider:null,
-    userId:function () {
-        if (window.location.pathname.split('/') !== -1) {
-            return window.location.pathname.split('/')[1];
-        } else {
-            return "username missing";
-        }
-    },
     init:function (openCallback) {
         if (typeof openCallback === 'function') openCallback();
     },
@@ -22,105 +18,125 @@ var webinosPZH = {
                     case 'getUserDetails':
                     case 'getCrashLog':
                     case 'getInfoLog':
-                    case 'pzhPzh':
                     case 'getPzps':
-                    case 'revokePzp':
                     case 'listAllServices':
                     case 'listUnregServices':
+                    case 'getAllPzh':
+                    case 'getRequestingExternalUser':
+                    case 'revokePzp':
                     case 'unregisterService':
                     case 'registerService':
-                    case 'getAllPzh':
-                    case 'approveUser':
                     case 'removePzh':
-                        if (typeof webinosPZH.callbacks[msg.type] === 'function') webinosPZH.callbacks[msg.type](msg.message);
+                        if (webinosPZH.callbacks.has(msg.type,msg.msgid)) {
+                          webinosPZH.callbacks.get(msg.type,msg.msgid)(msg.message);
+                          webinosPZH.callbacks.unset(msg.type,msg.msgid);
+                        } else {
+                          console.log("Could not invoke callback for: " + JSON.stringify(msg));
+                        }
                         break;
                 }
             }
         }
     },
-    send:function (payload) {
-        // Try to add from if specified in the url
-        var urlArgs = window.location.search.split("=");
-        if (urlArgs.length >= 2) payload.from = urlArgs[2];
+    send:function (command, id, payload) {
+        var msg = { 
+          "id"     : id,
+          "command": command, 
+          "payload": payload || null
+        }
+        if (document.getElementById('anticsrf') !== null) {
+          msg['_csrf'] = document.getElementById('anticsrf').innerHTML.trim();
+        }
+        
         webinosPZH.channel = new XMLHttpRequest();
         webinosPZH.channel.onreadystatechange = webinosPZH.messageReceived;
         var queryUrl = window.location.protocol + "//" + window.location.host + "/query";
         webinosPZH.channel.open("POST", queryUrl);
         webinosPZH.channel.setRequestHeader("Content-Type", "application/json");
-        webinosPZH.channel.send(JSON.stringify(payload));
-        console.log(JSON.stringify(queryUrl));
+        console.log("Sending to the PZH web interface: " + JSON.stringify(msg));
+        webinosPZH.channel.send(JSON.stringify(msg));
     },
     callbacks:{
-        getZoneStatus:null,
-        getUserDetails:null,
-        getCrashLog:null,
-        getInfoLog:null,
-        pzhPzh:null,
-        getPzps:null,
-        revokePzp:null,
-        listAllServices:null,
-        listUnregServices:null,
-        registerService:null,
-        unregisterService:null,
-        getAllPzh:null,
-        approveUser:null,
-        removePzh:null
+        set: function(msgtype, callback) {
+            var nextId = webinosPZH.getNextId();
+            if (!webinosPZH.callbacks.store.hasOwnProperty(msgtype)) {
+                webinosPZH.callbacks.store[msgtype] = {};
+            }
+            webinosPZH.callbacks.store[msgtype][nextId] = callback;
+            return nextId;
+        },
+        get: function(msgtype, id) {
+            if (webinosPZH.callbacks.store.hasOwnProperty(msgtype)) {
+                return webinosPZH.callbacks.store[msgtype][id];
+            }
+        },
+        has: function(msgtype, id) {
+            return webinosPZH.callbacks.store.hasOwnProperty(msgtype) &&
+                   webinosPZH.callbacks.store[msgtype].hasOwnProperty(id) &&
+                   typeof webinosPZH.callbacks.store[msgtype][id] === 'function';
+        },
+        unset: function(msgtype, id) {
+            if (webinosPZH.callbacks.store.hasOwnProperty(msgtype)) {
+              delete webinosPZH.callbacks.store[msgtype][id];
+            }
+        },
+        store:{}
     },
     commands:{
         getZoneStatus:function (callback) {
-            webinosPZH.callbacks.getZoneStatus = callback;
-            webinosPZH.send({payload:{status:"getZoneStatus"}});
+            var nextId = webinosPZH.callbacks.set('getZoneStatus', callback);
+            webinosPZH.send('getZoneStatus', nextId);            
         },
         getPzps:function (callback) {
-            webinosPZH.callbacks.getPzps = callback;
-            webinosPZH.send({payload:{status:"getPzps"}});
+            var nextId = webinosPZH.callbacks.set('getPzps', callback);
+            webinosPZH.send('getPzps', nextId);
         },
         revokePzp:function (id, callback) {
-            webinosPZH.callbacks.revokePzp = callback;
-            webinosPZH.send({payload:{status:"revokePzp", "pzpid":id}});
+            var nextId = webinosPZH.callbacks.set('revokePzp', callback);
+            webinosPZH.send('revokePzp', nextId, {"pzpid":id});            
         },
         listAllServices:function (callback) {
-            webinosPZH.callbacks.listAllServices = callback;
-            webinosPZH.send({payload:{status:"listAllServices"}});
+            var nextId = webinosPZH.callbacks.set('listAllServices', callback);
+            webinosPZH.send('listAllServices', nextId);
         },
         listUnregServices:function (at, callback) {
-            webinosPZH.callbacks.listUnregServices = callback;
-            webinosPZH.send({payload:{status:"listUnregServices", "at":at}});
+            var nextId = webinosPZH.callbacks.set('listUnregServices', callback);
+            webinosPZH.send('listUnregServices', nextId, {"at":at });
         },
         registerService:function (at, name, callback) {
-            webinosPZH.callbacks.registerService = callback;
-            webinosPZH.send({payload:{status:"registerService", "at":at, "name":name}});
+            var nextId = webinosPZH.callbacks.set('registerService', callback);
+            webinosPZH.send('registerService', nextId, {"at":at, "name":name});
         },
         unregisterService:function (svAddress, svId, svAPI, callback) {
-            webinosPZH.callbacks.unregisterService = callback;
-            webinosPZH.send({payload:{status:"unregisterService", "at":svAddress, "svId":svId, "svAPI":svAPI}});
+            var nextId = webinosPZH.callbacks.set('unregisterService', callback);
+            webinosPZH.send('unregisterService', nextId, {"at":svAddress, "svId":svId, "svAPI":svAPI});
         },
         getCrashLog:function (callback) {
-            webinosPZH.callbacks.getCrashLog = callback;
-            webinosPZH.send({payload:{status:'getCrashLog'}});
+            var nextId = webinosPZH.callbacks.set('getCrashLog', callback);
+            webinosPZH.send('getCrashLog', nextId);
         },
         getInfoLog:function (callback) {
-            webinosPZH.callbacks.getInfoLog = callback;
-            webinosPZH.send({payload:{status:'getInfoLog'}});
+            var nextId = webinosPZH.callbacks.set('getInfoLog', callback);
+            webinosPZH.send('getInfoLog', nextId);
         },
         getUserDetails:function (callback) {
-            webinosPZH.callbacks.getUserDetails = callback;
-            webinosPZH.send({payload:{status:'getUserDetails'}});
+            var nextId = webinosPZH.callbacks.set('getUserDetails', callback);
+            webinosPZH.send('getUserDetails', nextId);
         },
         restartPzh:function () {
-            webinosPZH.send({payload:{status:'restartPzh'}});
+            webinosPZH.send('restartPzh');
         },
         getAllPzh:function (callback) {
-            webinosPZH.callbacks.getAllPzh = callback;
-            webinosPZH.send({payload:{status:'getAllPzh'}});
+            var nextId = webinosPZH.callbacks.set('getAllPzh', callback);
+            webinosPZH.send('getAllPzh', nextId);
         },
-        approveUser:function (callback) {
-            webinosPZH.callbacks.approveUser = callback;
-            webinosPZH.send({payload:{status:'approveUser'}});
+        getRequestingExternalUser:function (callback) {
+            var nextId = webinosPZH.callbacks.set('getRequestingExternalUser', callback);
+            webinosPZH.send('getRequestingExternalUser', nextId);
         },
         removePzh:function (id, callback) {
-            webinosPZH.callbacks.removePzh = callback;
-            webinosPZH.send({payload:{status:'removePzh', id: id}});
+            var nextId = webinosPZH.callbacks.set('removePzh', callback);
+            webinosPZH.send('removePzh', nextId, {id: id});
         }
     }
 };
