@@ -1,9 +1,9 @@
 { "name": "webinos-pzh",
-  "version": "0.8.0",
+  "version": "0.8.2",
   "description": "Webinos server side functionality",
   "main": "./lib/pzh_sessionHandling.js",
   "author": "Habib Virji  <habib.virji@samsung.com>",
-  "repositories":{
+  "repository":{
      "type": "git",
      "url": "git://github.com/webinos/webinos-pzh.git"
    },
