@@ -1,0 +1,12 @@
+extends main
+
+block content
+    form(action="invite-friend-twitter", method="post")
+      fieldset#invite-twitter-friend.connect-fieldset
+        legend Invite Twitter Contact
+        select#twitter_user_list(name='twitterId')
+          - for (var i = 0; i < twitter.friends.length; i = i +1) {
+            option(value="#{twitter.friends[i].id}") #{twitter.friends[i].name} ( @#{twitter.friends[i].screen_name} )
+          - }
+        input(type='hidden', name='_csrf', value='#{_csrf}')
+        input(type='submit',value='Invite')

@@ -14,9 +14,10 @@ html
         label Sign up to create your own Personal Zone Hub
         input(type='hidden', name='_csrf', value='#{_csrf}')
         - if (error) { 
-          label Nickname already in use, please choose another.
+          label Nickname already in use or invalid. Please choose another.  
+          label Nicknames must contain only letters and numbers.
         - } 
-        input(type='text', name='nickname', value='')
+        input(type='text', name='nickname', value='#{proposedNick}')
         input(type="submit", class="btnLogin", value="Sign up!")
     footer#main
       a(href="http://www.webinos.org") Powered by webinos
