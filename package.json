@@ -3,7 +3,7 @@
   "description": "Webinos server side functionality",
   "main": "./lib/pzh_sessionHandling.js",
   "author": "Habib Virji  <habib.virji@samsung.com>",
-  "repositories":{
+  "repository":{
      "type": "git",
      "url": "git://github.com/webinos/webinos-pzh.git"
    },
@@ -28,5 +28,8 @@
   "preferGlobal": true,
   "bin": {
     "webinos_pzh": "webinos_pzh.js"
+  },
+  "scripts":{
+    "travis-test": "./test/travis-test.sh"
   }
 }
