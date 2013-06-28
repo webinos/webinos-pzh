@@ -23,6 +23,8 @@
     "webinos-certificateHandler": "git://github.com/webinos/webinos-certificateHandler.git",
     "openid": "0.x.x",
     "twit" : "1.1.x",
+    "goo.gl" : "0.0.2",
+    "fb" : "0.6.2",
     "express-validator":"0.3.x"
   },
   "devDependencies": {

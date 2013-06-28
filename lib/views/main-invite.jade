@@ -1,0 +1,13 @@
+extends main
+
+block content
+    form(action="#{postAddress}", method="post")
+      fieldset#invite-friend.connect-fieldset
+        legend Invite Contact
+        select#user_list(name='friendId')
+          - for (var i = 0; i < friends.length; i = i +1) {
+            option(value="#{friends[i].id}") #{friends[i].name} 
+            // ( @#{friends[i].screen_name} )
+          - }
+        input(type='hidden', name='_csrf', value='#{_csrf}')
+        input(type='submit',value='Invite')

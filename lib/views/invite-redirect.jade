@@ -1,0 +1,24 @@
+!!! 5
+html
+  head
+    title Invitation to access #{user.name}'s personal zone hub
+    link(rel="stylesheet", type="text/css", href="/css/reset.css")
+    link(rel="stylesheet", type="text/css", href="/css/structure.css")
+    link(rel="stylesheet", type="text/css", href="/css/login.css")
+    script(type="text/javascript", src="/js/view-login.js")
+  body
+    form.box.login(action="/inviteRedirect", method="post")
+      header
+        img(src="http://webinos.org/wp-content/themes/parallelus-unite/images/webinos_logo.png", width="100px")
+        label Connect to #{user.name} with webinos
+      fieldset.boxBody
+        label Please enter the URL of your PZH Web Server
+        input(type="text", name="pzhWebUrl", id="pzhWebUrl")
+        input(type="submit", class="btnLogin", value="Connect")
+        input(type='hidden', name='_csrf', value='#{_csrf}')
+        input(type='hidden', name='token', value='#{token}')
+        input(type='hidden', name='nickname', value='#{user.nickname}')
+    footer#main
+      a(href="http://www.webinos.org") Powered by webinos
+      |  |
+      a(href="http://developer.webinos.org")  Developer resources on webinos
