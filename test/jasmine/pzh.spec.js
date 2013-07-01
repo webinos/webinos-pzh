@@ -32,12 +32,15 @@ function createPzhProvider() {
 }
 
 function createPzh(pzhConnection, email, displayName) {
+    var nickname = email.split("@")[0]
     var user = {
         emails: [{value:email}],
         displayName: displayName,
-        from: "google"
+        from: "google",
+        nickname:nickname,
+        identifier:nickname+"@localhost"
     };
-    pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "addPzh"}})));
+    pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "addPzh", "nickname":nickname}})));
     return user;
 }
 
@@ -51,7 +54,7 @@ function connectProvider(callback) {
             pzhConnection.on("data", function (_buffer) {
                 wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
                     if(obj.payload && obj.payload.type && obj.payload.type === "addPzh") {
-                       expect(obj.payload.message).toContain(user.emails[0].value);
+                       expect(obj.payload.message.id).toContain(user.nickname);
                        callback(true);
                        pzhConnection.socket.end();
                     }
@@ -75,10 +78,14 @@ describe("connect pzh provider and create pzh", function(){
 });
 
 describe("test web api of PZH", function(){
+    var email = "hello0@webinos.org";
+    var nickname = email.split("@")[0]
     var user = {
-        emails: [{value:"hello0@webinos.org"}],
+        emails: [{value:email}],
         displayName: "Hello#0",
-        from: "google"
+        from: "google",
+        nickname:nickname,
+        identifier:nickname+"@localhost"
     };
     it("get user data", function(done){
        var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,function(){
@@ -107,7 +114,7 @@ describe("test web api of PZH", function(){
                     if(obj.payload && obj.payload.type && obj.payload.type === "getZoneStatus") {
                         expect(obj.payload.message.pzps).toEqual([]);
                         expect(obj.payload.message.pzhs[0].id).toEqual(user.displayName+" (Your Pzh)");
-                        expect(obj.payload.message.pzhs[0].url).toContain(user.emails[0].value);
+                        expect(obj.payload.message.pzhs[0].url).toContain(user.nickname);
                         expect(obj.payload.message.pzhs[0].isConnected).toBeTruthy();
                         pzhConnection.socket.end();
                         done();
@@ -165,12 +172,12 @@ describe("test web api of PZH", function(){
         certificateInstance.generateSelfSignedCertificate("PzpCA", "PzpCA:machine0");
         var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,function(){
             expect(pzhConnection.authorized).toEqual(true);
-            pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "csrAuthCodeByPzp",
+            pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "csrFromPzp",
                 from: webinosMetaData.webinosName, csr: certificateInstance.internal.master.csr, friendlyName: "Test"}})));
             pzhConnection.on("data", function (_buffer) {
                 wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
-                    if(obj.payload && obj.payload.type && obj.payload.type === "csrAuthCodeByPzp") {
-                        expect(obj.payload.message.from).toContain(user.emails[0].value);
+                    if(obj.payload && obj.payload.type && obj.payload.type === "csrFromPzp") {
+                        expect(obj.payload.message.from).toContain(user.nickname);
                         expect(obj.payload.message.to).toContain(webinosMetaData.webinosName);
                         expect(obj.payload.message.payload.message.clientCert).not.toBeNull();
                         expect(obj.payload.message.payload.message.masterCert).not.toBeNull();
@@ -192,14 +199,14 @@ describe("test web api of PZH", function(){
             pzhConnection.on("data", function (_buffer) {
                 wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
                     if(obj.payload && obj.payload.type && obj.payload.type === "listAllServices") {
-                        expect(obj.payload.message.pzEntityList[0].pzId).toContain(user.emails[0].value);
-                        expect(obj.payload.message.services[0].serviceAddress).toContain(user.emails[0].value);
-                        expect(obj.payload.message.services[1].serviceAddress).toContain(user.emails[0].value);
-                        expect(obj.payload.message.services[2].serviceAddress).toContain(user.emails[0].value);
+                        expect(obj.payload.message.pzEntityList[0].pzId).toContain(user.nickname);
+                        expect(obj.payload.message.services[0].serviceAddress).toContain(user.nickname);
+                        expect(obj.payload.message.services[1].serviceAddress).toContain(user.nickname);
+                        expect(obj.payload.message.services[2].serviceAddress).toContain(user.nickname);
                         pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user,
-                            message: {type: "listUnregServices", at: pzhAddress+":"+providerWebServer+"_"+user.emails[0].value}})));
+                            message: {type: "listUnregServices", at: user.nickname+"@"+pzhAddress}})));
                     } else if(obj.payload && obj.payload.type && obj.payload.type === "listUnregServices") {
-                        expect(obj.payload.message.pzEntityId).toContain(user.emails[0].value);
+                        expect(obj.payload.message.pzEntityId).toContain(user.nickname);
                         expect(obj.payload.message.modules).not.toBeNull();
                         pzhConnection.socket.end();
                         done();
@@ -246,7 +253,7 @@ describe("test web api of PZH", function(){
         var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,function(){
             expect(pzhConnection.authorized).toEqual(true);
 
-            pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "revokePzp", pzpid:pzhAddress+":"+providerWebServer+"_"+user.emails[0].value+"/machine0"}})));
+            pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "revokePzp", pzpid:user.nickname+"@"+pzhAddress+"/machine0"}})));
             pzhConnection.on("data", function (_buffer) {
                 wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
                     if(obj.payload && obj.payload.type && obj.payload.type === "revokePzp") {
@@ -261,7 +268,7 @@ describe("test web api of PZH", function(){
     it("remove pzh", function(done){
         var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,function(){
             expect(pzhConnection.authorized).toEqual(true);
-            pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "removePzh", id:pzhAddress+":"+providerWebServer+"_"+user.emails[0].value }})));
+            pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "removePzh", id:user.nickname+"@"+pzhAddress }})));
             pzhConnection.on("data", function (_buffer) {
                 wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
                     if(obj.payload && obj.payload.type && obj.payload.type === "removePzh") {
