@@ -6,8 +6,9 @@ html
     link(rel="stylesheet", type="text/css", href="/css/structure.css")
     link(rel="stylesheet", type="text/css", href="/css/login.css")
     script(type="text/javascript", src="/js/view-login.js")
+    script(type="text/javascript", src="/js/get-pzh-info.js")
   body
-    form.box.login(action="/inviteRedirect", method="post")
+    form.box.login#inviteRedirectForm(action="/inviteRedirect", method="post")
       header
         img(src="http://webinos.org/wp-content/themes/parallelus-unite/images/webinos_logo.png", width="100px")
         label Connect to #{user.name} with webinos
