@@ -78,6 +78,7 @@ describe("test web api of PZH", function(){
     var user = {
         emails: [{value:"hello0@webinos.org"}],
         displayName: "Hello#0",
+        nickname: "Hello#0",
         from: "google"
     };
     it("get user data", function(done){
