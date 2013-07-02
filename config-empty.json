@@ -35,7 +35,7 @@
       , "connect-src" : "*"
       , "script-src"  : ["'self'", "https://ajax.googleapis.com", "'unsafe-inline'"]
       , "style-src"   : ["'self'", "'unsafe-inline'"]
-      , "img-src"   : ["'self'", "https://ssl.gstatic.com", "http://webinos.org", "http://www.webinos.org", "http://l.yimg.com", "https://twitter.com", "http://cav2013.forsyte.at", "http://openid.net", "https://si0.twimg.com"]
+      , "img-src"   : "*"
       }
     }
 }
