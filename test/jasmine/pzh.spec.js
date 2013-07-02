@@ -35,9 +35,10 @@ function createPzh(pzhConnection, email, displayName) {
     var user = {
         emails: [{value:email}],
         displayName: displayName,
+        nickname: "Hello#0",
         from: "google"
     };
-    pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "addPzh"}})));
+    pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "addPzh", "nickname":user.nickname}})));
     return user;
 }
 
