@@ -10,7 +10,7 @@ block content
             option(value="#{pzhlist[i].nickname}") #{pzhlist[i].username} ( #{pzhlist[i].nickname} )      
           - }
         input(type='hidden', name='_csrf', value='#{_csrf}')
-        input(type='submit',value='Connect Pzh')
+        input(type='submit',value='Connect')
   -}
     form(action="connect-friend", method="post")
       fieldset#connect-friend.connect-fieldset
@@ -25,6 +25,19 @@ block content
           dt
             input#connectPzhId(type='text', name='nickname', value='')
           dt
-            input(type='submit', value='Connect Pzh')
+            input(type='submit', value='Connect')
           dt
             input(type='hidden', name='_csrf', value='#{_csrf}')            
+    fieldset#connect-friend.connect-fieldset
+      legend Send a link to a friend
+      p You can give the following URL to a friend to let them automatically connect to your personal zone.  
+      p
+        a(href="#{linkUrl}") #{linkUrl}
+      p Note that these links can only be used by one person, and should only be given to people that you trust to see your personal zone information, including whether your devices are active, and what services they offer.
+      -if (profile.from === "twitter") {
+      p Alternatively, you can send invitations directly through 
+        a(href="/invite") Twitter direct messages
+      -} else if (profile.from === "facebook") {
+      p Alternatively, you can send invitations directly through 
+        a(href="/invite") Facebook
+      -}

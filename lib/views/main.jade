@@ -44,10 +44,6 @@ html
       ul#enumConnectedPzh(style="display: block;")
       ul#connectToAnotherPZHLink
         li: a#connectPzh(href="/connectPzh") Connect to another personal zone...
-        - if (profile.provider === "twitter") {
-        li: a#inviteViaTwitter(href="/twitterInvite") Invite friends through Twitter
-        // li: a#inviteViaGeneric(href="/genericInvite") Generate invite URL
-        - }
         li: a#approveUser(href="/approveUser") 
           span#approveUserCount 0
           span#approveUserAfterText User waiting for approval...
