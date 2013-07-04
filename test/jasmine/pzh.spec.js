@@ -54,7 +54,7 @@ function connectProvider(callback) {
             pzhConnection.on("data", function (_buffer) {
                 wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
                     if(obj.payload && obj.payload.type && obj.payload.type === "addPzh") {
-                       expect(obj.payload.message.nickname).toContain(user.displayName);
+                       expect(obj.payload.message.id).toContain(user.nickname);
                        callback(true);
                        pzhConnection.socket.end();
                     }
