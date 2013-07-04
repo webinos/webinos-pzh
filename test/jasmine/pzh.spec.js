@@ -82,7 +82,7 @@ describe("test web api of PZH", function(){
     var nickname = email.split("@")[0]
     var user = {
         emails: [{value:email}],
-        displayName: "Hello#0",
+        displayName: "hello0",
         from: "google",
         nickname:nickname,
         identifier:nickname+"@localhost"
