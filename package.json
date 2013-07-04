@@ -6,9 +6,9 @@
   "author": "Habib Virji  <habib.virji@samsung.com>, John Lyle <john.lyle@cs.ox.ac.uk>",
   "homepage": "http://www.webinos.org",
   "bugs": "http://jira.webinos.org",
-  "repositories": {
+  "repository": {
     "type": "git",
-    "url": "git://github.com/webinos/webinos-pzhWebServer.git"
+    "url": "https://github.com/webinos/webinos-pzhWebServer.git"
   },
   "dependencies": {
     "express": "3.3.1",
