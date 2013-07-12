@@ -1,0 +1,25 @@
+extends main
+
+block content
+  - if (certs !== null && certs.signedCert && certs.signedCert.length > 0) {
+    form(action='/revokePzp', method='post')
+      fieldset#revoke-device.connect-fieldset
+        legend Your Personal Zone Devices
+        select#revoke_pzp(name='pzp')
+          - for(var i=0; i<certs.signedCert.length; i++) {
+          -   var shortname = certs.signedCert[i].url.substring(certs.signedCert[i].url.lastIndexOf("/")+1);
+              option(value="#{certs.signedCert[i].url}") #{certs.signedCert[i].id} ( #{shortname} )
+          - } 
+        input(type='hidden', name='_csrf', value='#{_csrf}')
+        input(type='submit', value='Remove permanently')
+  - }
+  - if (certs !== null && certs.signedCert && certs.revokedCert.length > 0) {
+  h3 Devices already removed
+    ul
+      - for (var i=0; i < certs.revokedCert.length; i++ ) {
+          li #{certs.revokedCert[i].id}
+      - }
+  -}
+  - if (certs == null || certs.revokedCert.length === 0 && certs.signedCert.length === 0) {
+      p You have no personal zone devices to remove 
+  - }

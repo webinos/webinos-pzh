@@ -1,0 +1,11 @@
+extends main
+
+block content
+    h3 Invite Contact
+    - if (showMessage) {
+    p A message has been sent to this user to invite them to use your personal zone's services.
+    - } 
+    - if (showLink) {
+    p Please give the following link to the person with whom you would like to connect
+    a(href="#{linkUrl}") #{linkUrl}
+    - }
