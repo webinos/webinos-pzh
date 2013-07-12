@@ -1,6 +1,6 @@
 {
     "ports": {
-        "provider": 6080,
-        "provider_webServer": 6443
+        "provider": 80,
+        "provider_webServer": 443
     }
 }
