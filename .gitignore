@@ -1,0 +1,51 @@
+# build stuff
+build
+out
+*.node
+linker.lock
+*.o
+*.class
+
+# gyp generated
+webinos/common/manager/certificate_manager/src/Makefile
+webinos/common/manager/certificate_manager/src/*.mk
+
+# node_modules
+/node_modules/
+
+# generated certificates
+*.pem
+*.csr
+*.crl
+*.srl
+
+# target folders
+target
+
+# reports folders
+reports
+
+# eclipse project files
+.project
+.settings
+/.metadata/
+
+# intellij idea project files
+.idea
+*.iml
+*.ipr
+*.iws
+
+# vstudio prj files
+*.sln
+*.vcxproj*
+
+# waf lock files
+.lock-wscript
+
+# backup files
+*~
+
+# vi swap file
+*.swp
+

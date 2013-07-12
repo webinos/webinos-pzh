@@ -17,7 +17,7 @@
 * Copyright 2011 Habib Virji, Samsung Electronics (UK) Ltd
 *******************************************************************************/
 var pzh_provider  = require("./lib/pzh_provider.js");
-var pzh_web       = require("webinos-pzhWebServer");
+var pzh_web       = require("./web-lib/startweb.js");
 
 var host = null, name = null;
 
