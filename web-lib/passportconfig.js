@@ -117,11 +117,11 @@ PassportConfig.createPassport = function(serverUrl, cb) {
 }
 
 function readConfig() {
-    return require(require('path').join('..', 'config.json'));
+    return require(require('path').join('..', 'webconfig.json'));
 }
 
 function disabledMessage(idp) {
-    console.log("Login via " + idp + " disabled in config.json");
+    console.log("Login via " + idp + " disabled in webconfig.json");
 }
 
 function isIdpEnabled(idp, config) {
