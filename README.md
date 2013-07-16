@@ -23,10 +23,20 @@ The webinos personal zone hub can be installed using the following instructions.
 
 The PZH currently requires nodejs version 0.8, and is not guaranteed to work on v0.10 or higher.
 
-We have tested the PZH on Linux.  It should work on other platforms, but YMMV.
+On Ubuntu Linux, you need the following packages:
+
+* g++ 
+* libssl-dev 
+* gnome-keyring 
+* libgnome-keyring-dev
+ 
+I.e., run `sudo apt-get install g++ libssl-dev gnome-keyring libgnome-keyring-dev`
+
+We have tested the PZH on Ubuntu Linux 12.04.  It should work on other platforms, but YMMV.
 
 ### Steps
 
+* Make sure you have all the required packages.
 * Download the latest version of webinos-pzh from github.
 * Run `npm install` to install the dependencies.
 * Run the PZH through `node webinos_pzh.js --host YOURDOMAINNAME`.  You will need to have superuser privileges to run node on low-number ports.  E.g., on Ubuntu run `sudo node webinos_pzh.js --host pzh.webinos.org`
