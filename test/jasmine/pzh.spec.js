@@ -267,14 +267,13 @@ describe("test web api of PZH", function(){
         var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,function(){
             expect(pzhConnection.authorized).toEqual(true);
             pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "removePzh", id:user.nickname + "@" + pzhAddress }})));
-                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
-                    if(obj.payload && obj.payload.type && obj.payload.type === "removePzh") {
-                        console.log(obj.payload.message);
-                        pzhConnection.socket.end();
-                        //    "revokePzp"             :revokePzp,  "csrAuthCodeByPzp"      :csrAuthCodeByPzp,
-                        done();
-                    }
-                });
+            wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                if(obj.payload && obj.payload.type && obj.payload.type === "removePzh") {
+                    console.log(obj.payload.message);
+                    pzhConnection.socket.end();
+                    //    "revokePzp"             :revokePzp,  "csrAuthCodeByPzp"      :csrAuthCodeByPzp,
+                    done();
+                }
             });
         });
     });
