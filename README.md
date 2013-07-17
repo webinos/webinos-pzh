@@ -4,6 +4,9 @@ webinos-pzh
 The webinos Personal Zone Hub (PZH) is an online router for webinos-enabled devices, as well as providing 
 authentication between people in different personal zones.
 
+_**Warning!** webinos is software created as part of a research project. It is not appropriate for use on real systems at the moment.  There are many unimplemented features, including critical security and reliability issues.  You use it at your own peril._
+
+
 ## Web Servers
 
 The PZH consists of two different web servers:
