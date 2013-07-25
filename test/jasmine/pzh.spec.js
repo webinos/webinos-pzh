@@ -202,11 +202,11 @@ describe("test web api of PZH", function(){
                         expect(obj.payload.message.pzEntityList[0].pzId).toContain(user.nickname);
                         expect(obj.payload.message.services[0].serviceAddress).toContain(user.nickname);
                         expect(obj.payload.message.services[1].serviceAddress).toContain(user.nickname);
-                        expect(obj.payload.message.services[2].serviceAddress).toContain(user.nickname);
-                        /*pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user,
+                        pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user,
                             message: {type: "listUnregServices", at: user.nickname + "@" + pzhAddress}})));
+                     } else if(obj.payload && obj.payload.type && obj.payload.type === "listUnregServices") {
                         expect(obj.payload.message.pzEntityId).toContain(user.nickname);
-                        expect(obj.payload.message.modules).not.toBeNull();*/
+                        expect(obj.payload.message.modules).not.toBeNull();
                         pzhConnection.socket.end();
                         done();
                     }
