@@ -95,7 +95,7 @@ describe("test web api of PZH", function(){
                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
                    if(obj.payload && obj.payload.type && obj.payload.type === "getUserDetails") {
                        expect(obj.payload.message.authenticator).toEqual(user.from);
-                       expect(obj.payload.message.name).toEqual(user.nickname);
+                       expect(obj.payload.message.name).toEqual(user.displayName);
                        expect(obj.payload.message.email).toEqual(user.emails);
                        pzhConnection.socket.end();
                        done();
@@ -269,13 +269,15 @@ describe("test web api of PZH", function(){
         var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,function(){
             expect(pzhConnection.authorized).toEqual(true);
             pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "removePzh", id:user.nickname + "@" + pzhAddress }})));
-            wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
-                if(obj.payload && obj.payload.type && obj.payload.type === "removePzh") {
-                    console.log(obj.payload.message);
-                    pzhConnection.socket.end();
-                    //    "revokePzp"             :revokePzp,  "csrAuthCodeByPzp"      :csrAuthCodeByPzp,
-                    done();
-                }
+            pzhConnection.on("data", function (_buffer) {
+              wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                  if(obj.payload && obj.payload.type && obj.payload.type === "removePzh") {
+                      console.log(obj.payload.message);
+                      pzhConnection.socket.end();
+                      //    "revokePzp"             :revokePzp,  "csrAuthCodeByPzp"      :csrAuthCodeByPzp,
+                      done();
+                  }
+              });
             });
         });
     });
