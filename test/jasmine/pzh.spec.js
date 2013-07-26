@@ -45,16 +45,14 @@ function createPzh(pzhConnection, email, displayName) {
 }
 
 function connectProvider(callback) {
-    wUtil.webinosHostname.getHostName("", function (address) {
-        pzhAddress= address;
-        var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,
-        function () {
-            expect(pzhConnection.authorized).toEqual(true);
-            var user = createPzh(pzhConnection, "hello0@webinos.org", "Hello#0");
-            pzhConnection.on("data", function (_buffer) {
-                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
-                    if(obj.payload && obj.payload.type && obj.payload.type === "addPzh") {
-                       expect(obj.payload.message.id).toContain(user.nickname);
+    var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,
+    function () {
+        expect(pzhConnection.authorized).toEqual(true);
+        var user = createPzh(pzhConnection, "hello0@webinos.org", "Hello#0");
+        pzhConnection.on("data", function (_buffer) {
+            wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                if(obj.payload && obj.payload.type && obj.payload.type === "addPzh") {
+                   expect(obj.payload.message.id).toContain(user.nickname);
                        callback(true);
                        pzhConnection.socket.end();
                     }
@@ -64,16 +62,18 @@ function connectProvider(callback) {
                console.log(err);
             });
         });
-    });
 }
 
 describe("connect pzh provider and create pzh", function(){
    it("create pzh", function(done){
-       if (createPzhProvider()) {
+      wUtil.webinosHostname.getHostName("", function (address) {
+        pzhAddress= address;
+        if (createPzhProvider()) {
            connectProvider(function(){
                done();
            });
        }
+     });
     }, 3000);
 });
 
@@ -95,7 +95,7 @@ describe("test web api of PZH", function(){
                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
                    if(obj.payload && obj.payload.type && obj.payload.type === "getUserDetails") {
                        expect(obj.payload.message.authenticator).toEqual(user.from);
-                       expect(obj.payload.message.name).toEqual(user.nickname);
+                       expect(obj.payload.message.name).toEqual(user.displayName);
                        expect(obj.payload.message.email).toEqual(user.emails);
                        pzhConnection.socket.end();
                        done();
@@ -202,9 +202,9 @@ describe("test web api of PZH", function(){
                         expect(obj.payload.message.pzEntityList[0].pzId).toContain(user.nickname);
                         expect(obj.payload.message.services[0].serviceAddress).toContain(user.nickname);
                         expect(obj.payload.message.services[1].serviceAddress).toContain(user.nickname);
-                        expect(obj.payload.message.services[2].serviceAddress).toContain(user.nickname);
                         pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user,
                             message: {type: "listUnregServices", at: user.nickname + "@" + pzhAddress}})));
+                     } else if(obj.payload && obj.payload.type && obj.payload.type === "listUnregServices") {
                         expect(obj.payload.message.pzEntityId).toContain(user.nickname);
                         expect(obj.payload.message.modules).not.toBeNull();
                         pzhConnection.socket.end();
@@ -222,6 +222,7 @@ describe("test web api of PZH", function(){
                 wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
                     if(obj.payload && obj.payload.type && obj.payload.type === "getAllPzh") {
                         expect(obj.payload.message).toEqual([]);
+                        pzhConnection.socket.end();
                         done();
                     }
                 });
@@ -256,6 +257,7 @@ describe("test web api of PZH", function(){
                 wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
                     if(obj.payload && obj.payload.type && obj.payload.type === "revokePzp") {
                         expect(obj.payload.message).toBeTruthy();
+                        pzhConnection.socket.end();
                         done();
                     }
                 });
@@ -267,13 +269,15 @@ describe("test web api of PZH", function(){
         var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,function(){
             expect(pzhConnection.authorized).toEqual(true);
             pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "removePzh", id:user.nickname + "@" + pzhAddress }})));
-            wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
-                if(obj.payload && obj.payload.type && obj.payload.type === "removePzh") {
-                    console.log(obj.payload.message);
-                    pzhConnection.socket.end();
-                    //    "revokePzp"             :revokePzp,  "csrAuthCodeByPzp"      :csrAuthCodeByPzp,
-                    done();
-                }
+            pzhConnection.on("data", function (_buffer) {
+              wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                  if(obj.payload && obj.payload.type && obj.payload.type === "removePzh") {
+                      console.log(obj.payload.message);
+                      pzhConnection.socket.end();
+                      //    "revokePzp"             :revokePzp,  "csrAuthCodeByPzp"      :csrAuthCodeByPzp,
+                      done();
+                  }
+              });
             });
         });
     });
