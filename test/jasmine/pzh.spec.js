@@ -64,6 +64,7 @@ function connectProvider(callback) {
                console.log(err);
             });
         });
+    });    
 }
 
 describe("connect pzh provider and create pzh", function(){
