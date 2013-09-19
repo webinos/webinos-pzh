@@ -45,14 +45,16 @@ function createPzh(pzhConnection, email, displayName) {
 }
 
 function connectProvider(callback) {
-    var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,
-    function () {
-        expect(pzhConnection.authorized).toEqual(true);
-        var user = createPzh(pzhConnection, "hello0@webinos.org", "Hello#0");
-        pzhConnection.on("data", function (_buffer) {
-            wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
-                if(obj.payload && obj.payload.type && obj.payload.type === "addPzh") {
-                   expect(obj.payload.message.id).toContain(user.nickname);
+    wUtil.webinosHostname.getHostName("", function (address) {
+        pzhAddress= address;
+        var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,
+        function () {
+            expect(pzhConnection.authorized).toEqual(true);
+            var user = createPzh(pzhConnection, "hello0@webinos.org", "hello0");
+            pzhConnection.on("data", function (_buffer) {
+                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                    if(obj.payload && obj.payload.type && obj.payload.type === "addPzh") {
+                       expect(obj.payload.message.id).toContain(user.nickname);
                        callback(true);
                        pzhConnection.socket.end();
                     }
@@ -62,6 +64,7 @@ function connectProvider(callback) {
                console.log(err);
             });
         });
+    });    
 }
 
 describe("connect pzh provider and create pzh", function(){
@@ -82,7 +85,7 @@ describe("test web api of PZH", function(){
     var nickname = email.split("@")[0]
     var user = {
         emails: [{value:email}],
-        displayName: "Hello#0",
+        displayName: "hello0",
         from: "google",
         nickname:nickname,
         identifier:nickname+"@localhost"
