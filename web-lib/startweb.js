@@ -50,7 +50,7 @@ function loadWSCertificate(config, certName, certLabel) {
     }
 }
 
-starter.startWS = function(hostname, friendlyName, callback) {
+starter.startWS = function(hostname, friendlyName, userPref, callback) {
     wUtil.webinosHostname.getHostName(hostname, function (address) {
         var inputConfig = {
             "friendlyName": friendlyName,
@@ -58,12 +58,13 @@ starter.startWS = function(hostname, friendlyName, callback) {
         };
         var config = new wUtil.webinosConfiguration("PzhP", inputConfig);
         config.cert = new certificateHandler(config.metaData);
-        
+        config.userPref = userPref;
         if(config.loadWebinosConfiguration()){
             if(!config.loadCertificates(config.cert)) {
                 logger.error("certificate not available");
                 return callback(false);
             } else if(loadWSCertificate(config, "webssl", "PzhSSL") && loadWSCertificate(config, "webclient", "PzhWS")){
+
                 logger.log("starting the web server on " + config.userPref.ports.provider_webServer);
                 pzhproviderweb.startWebServer(hostname,
                 address,

@@ -302,6 +302,7 @@ function getPzhStatus(profile, callback) {
         profile.hasPzh = answer.message.result;
         if (answer.message.result) {
             profile.nickname = answer.message.user.nickname;
+            profile.photoUrl = answer.message.user.photoUrl;
         }
         callback(null, profile);
     });

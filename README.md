@@ -1,7 +1,7 @@
 webinos-pzh
 ===========
 
-The webinos Personal Zone Hub (PZH) is an online router for webinos-enabled devices, as well as providing 
+The webinos Personal Zone Hub (PZH) is an online router for webinos-enabled devices, as well as providing
 authentication between people in different personal zones.
 
 _**Warning!** webinos is software created as part of a research project. It is not appropriate for use on real systems at the moment.  There are many unimplemented features, including critical security and reliability issues.  You use it at your own peril._
@@ -15,7 +15,7 @@ The PZH consists of two different web servers:
 * A web server, running by default on port 443, which serves webpages to people connecting with a browser.  The web server is currently in repository [webinos-pzhWebServer](https://github.com/webinos/webinos-pzhWebServer), and ia a required dependency of the webinos-pzh
 module.
 
-These two servers can be on different machines, and communicate through a TLS connection 
+These two servers can be on different machines, and communicate through a TLS connection
 established by the PZH Web Server.  However, separating these two servers is currently not supported.
 
 ## Installation
@@ -28,11 +28,11 @@ The PZH currently requires nodejs version 0.8, and is not guaranteed to work on 
 
 On Ubuntu Linux, you need the following packages:
 
-* g++ 
-* libssl-dev 
-* gnome-keyring 
+* g++
+* libssl-dev
+* gnome-keyring
 * libgnome-keyring-dev
- 
+
 I.e., run `sudo apt-get install g++ libssl-dev gnome-keyring libgnome-keyring-dev`
 
 We have tested the PZH on Ubuntu Linux 12.04.  It should work on other platforms, but YMMV.
