@@ -1,0 +1,18 @@
+extends main
+
+block append scripts
+  script(src="/js/go-home.js", type="text/javascript")
+
+block header
+  h3 Invitation to connect
+
+block content
+  p You are seeing this page because you have clicked on a link with an invitation to connect to another user's personal zone.
+  p If you were not expecting to see this page, please click 'No, thanks'.  Otherwise, click 'Accept invitation' to continue.
+  form(action="acceptTokenInvite", method="post")
+    fieldset#confirm-invite.connect-fieldset
+      input(type='hidden', name='_csrf', value='#{_csrf}')
+      input(type='hidden', name='externalPzhUrl', value='#{external.pzhurl}')
+      input(type='submit',value="Accept invitation")
+      input(type="button", onclick="goHome()", value="No, thanks.")
+      input(type="button", onclick="goHome()", value="I'm not sure what's going on")}

@@ -1,5 +1,5 @@
 { "name": "webinos-pzh",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "Webinos server side functionality",
   "main": "./lib/pzh_sessionHandling.js",
   "author": "Habib Virji  <habib.virji@samsung.com>",
@@ -11,14 +11,27 @@
   "directories": {
     "lib": "./lib",
     "test":"./test",
-    "web":"./web"
+    "web-lib":"./web-lib",
+    "public":"public"
   },
   "dependencies":{
-    "webinos-jsonrpc2"          : "*",
+    "webinos-jsonrpc2" : "*",
     "webinos-certificateHandler": "git://github.com/webinos/webinos-certificateHandler.git",
     "webinos-utilities"         : "git://github.com/webinos/webinos-utilities.git",
     "optimist": "*",
-    "webinos-pzhWebServer":"git://github.com/webinos/webinos-pzhWebServer.git"
+    "express": "3.3.1",
+    "passport": "0.1.17",
+    "passport-yahoo": "0.3.0",
+    "passport-google": "0.3.0",
+    "passport-facebook": "0.1.5",
+    "passport-twitter": "0.1.5",
+    "passport-openid": "0.3.1",
+    "jade": "0.32.0",
+    "openid": "0.5.x",
+    "twit" : "1.1.x",
+    "goo.gl" : "0.0.2",
+    "fb" : "0.6.2",
+    "express-validator":"0.3.x"
   },
   "bundleDependencies":["webinos-api-test"],
   "preferGlobal": true,

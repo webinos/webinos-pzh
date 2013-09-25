@@ -1,0 +1,29 @@
+extends main
+
+block content
+  h3 Currently available services
+  p The following services are available in your personal zone
+  ul
+    - for (var i=0; i<services.services.length; i++) {
+      li
+        form(action="/unregister-service", method="post")
+          label #{services.services[i].api} @ #{services.services[i].serviceAddress}
+          input(type='hidden', name='_csrf', value='#{_csrf}')
+          input(type='hidden', name='serviceAddress', value='#{services.services[i].serviceAddress}')          
+          input(type='hidden', name='id', value='#{services.services[i].id}')
+          input(type='hidden', name='api', value='#{services.services[i].api}')
+          input(type='submit', value='Unregister service')
+    - }
+  
+  h3 Other personal zone items
+  p Click on one of the following names to view all services it has available
+    ul
+      - for(var j=0; j<services.pzEntityList.length; j++) {
+        li
+          a(onclick="showServiceForEntity('#{services.pzEntityList[j].pzId}')", href="#view-entity-services") #{services.pzEntityList[j].pzId}
+          form.hidden(id="form-#{services.pzEntityList[j].pzId}", action="/register-service", method="post")
+            input(type='hidden', name='_csrf', value='#{_csrf}')
+            
+      - }
+
+//TODO: Listing services seems to be broken at the PZH TLS server.  Needs fixing.
