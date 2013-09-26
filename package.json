@@ -1,5 +1,5 @@
 { "name": "webinos-pzh",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "description": "Webinos server side functionality",
   "main": "./lib/pzh_sessionHandling.js",
   "author": "Habib Virji  <habib.virji@samsung.com>",
