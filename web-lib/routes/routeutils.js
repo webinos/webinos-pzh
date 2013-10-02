@@ -240,6 +240,7 @@ var RouteUtils = function(address, port, tlsServerPort, authConfig) {
 	RouteUtils.prototype.getJsonFromHostByUrl = function(url, successcb, errorcb) {
 	    var parsedUrl = require('url').parse(url);
 	    parsedUrl.method = "GET";
+        parsedUrl.rejectUnauthorized = false;
 	    RouteUtils.prototype.getJsonFromHostDirect(parsedUrl, successcb, errorcb);
 	};
 

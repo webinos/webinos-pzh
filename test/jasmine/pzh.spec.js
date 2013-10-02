@@ -98,8 +98,8 @@ describe("test web api of PZH", function(){
                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
                    if(obj.payload && obj.payload.type && obj.payload.type === "getUserDetails") {
                        expect(obj.payload.message.authenticator).toEqual(user.from);
-                       expect(obj.payload.message.name).toEqual(user.displayName);
-                       expect(obj.payload.message.email).toEqual(user.emails);
+                       expect(obj.payload.message.friendlyName).toEqual(user.displayName);
+                       expect(obj.payload.message.email).toEqual(user.emails[0].value);
                        pzhConnection.socket.end();
                        done();
                    }

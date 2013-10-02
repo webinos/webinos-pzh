@@ -49,17 +49,20 @@ module.exports = function (app, address, port, routeutil) {
     });
     
     function handleEnrolmentPostLogin(req,res) {
-        var pzpPort = req.session.pzpPort;
-        req.session.isPzp = "";
-        req.session.pzpPort = "";        
         res.render("enroll-pzp", {
             "address":address, 
             "port":port, 
             "user":req.user, 
             "profile":req.user,
-            "pzpPort":pzpPort,
+            "pzpPort":req.session.pzpPort,
+            "deviceType":req.session.deviceType,
+            "friendlyName":req.session.friendlyName,
             "_csrf":req.session._csrf
         });
+        req.session.isPzp = "";
+        req.session.pzpPort = "";
+        req.session.deviceType = "";
+        req.session.friendlyName = "";
     }
 
     app.get('/home', routeutil.ensureHasPzh, function (req, res) {
@@ -94,9 +97,16 @@ module.exports = function (app, address, port, routeutil) {
         if (typeof req.query.error === undefined || req.query.error === null) {
             req.query.error = false;
         }
-        var proposedNick = req.user.username || req.user.displayName;
-        proposedNick = proposedNick.trim().replace(" ", "").replace(":","").toLowerCase().replace(/\W/g, '');
-        res.render("signup", {user:req.user, proposedNick:proposedNick, _csrf:req.session._csrf, error:req.query.error});
+        if (req.user) {
+            var proposedNick = req.user.username || req.user.displayName ||
+            (req.user.emails && req.user.emails[0] && req.user.emails[0].value && req.user.emails[0].value.split("@") || req.user.emails[0].value.split("@")[0] );
+            if (proposedNick){
+               proposedNick = proposedNick.trim().replace(" ", "").replace(":","").toLowerCase().replace(/\W/g, '');
+            } else {
+               proposedNick="Set your preferred nickname";
+            }
+            res.render("signup", {user:req.user, proposedNick:proposedNick, _csrf:req.session._csrf, error:req.query.error});
+        }
     });
    
     // present certificates to an external party.
@@ -178,6 +188,19 @@ module.exports = function (app, address, port, routeutil) {
         return null;
     }
 
+    app.post('/setPhotoURL', routeutil.ensureHasPzh, function (req, res) {
+        console.log("SET PHOTO URL >> ",req.body)
+        req.assert('photoURL', 'Should not be empty').notEmpty();
+        if (!routeutil.isValid(req,res)) return;
+        if (!routeutil.checkCSRF(req,res)) return;
+        var dataSend = {
+            message: req.body.photoURL
+        };
+        pzhadaptor.fromWeb(req.user, "setPhotoURL", dataSend, function(){
+            req.user.photoUrl = req.body.photoURL;
+            res.redirect('/');
+        });
+    });
     app.post('/pzpEnroll', routeutil.ensureHasPzh, function (req, res) {
         req.assert('from', 'Invalid from field').notEmpty();
         req.assert('csr', 'Invalid csr').notEmpty();
@@ -187,7 +210,8 @@ module.exports = function (app, address, port, routeutil) {
         var dataSend = {
             from:req.body.from,
             csr:req.body.csr,
-            friendlyName: req.body.friendlyName
+            friendlyName: req.body.friendlyName,
+            deviceType: req.body.deviceType
         }
 
         pzhadaptor.fromWeb(req.user, "csrFromPzp", dataSend, res);
@@ -208,6 +232,7 @@ module.exports = function (app, address, port, routeutil) {
               //Assume successful PZH addition.
               req.user.hasPzh = true;
               req.user.nickname = msg.message.nickname;
+              req.user.photoUrl = msg.message.photoUrl;
               res.redirect('/');
           }
         });
