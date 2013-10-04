@@ -1,11 +1,28 @@
 extends main
 
 block content
-  h3 Name: #{profile.displayName}
-  h3 Nickname: #{profile.nickname}
-  h3 Email: #{profile.emails[0].value}
-  - if (profile.photoUrl) {
-    img(src="#{profile.photoUrl}")
-  - } else if (typeof profile.photos !== 'undefined' && profile.photos[0] !== null && profile.photos[0].value) {
-    img(src="#{profile.photos[0].value}", width='100px')
-  - }
+  table
+    tr
+      td
+         - if (profile.photoUrl) {
+             img(src="#{profile.photoUrl}", width='100px')
+         - } else if (typeof profile.photos !== 'undefined' && profile.photos[0] !== null && profile.photos[0].value) {
+             img(src="#{profile.photos[0].value}", width='100px')
+         - }
+      td
+         h3 Name: #{profile.displayName}
+         h3 Nickname: #{profile.nickname}
+         h3 Email: #{profile.emails[0].value}
+    tr
+      td
+         form(action="setPhotoURL", method="post")
+            input#photoURL(type='text', name='photoURL', value='')
+            input(type='submit',  value='Set Image URL')
+            input(type='hidden', name='_csrf', value='#{_csrf}')
+      td
+  table
+
+
+
+
+

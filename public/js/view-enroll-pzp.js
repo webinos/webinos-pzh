@@ -33,7 +33,7 @@ function enrol(pzpPort, user, pzhPort, pzhAddress, csrf) {
 		   }
 		   req.open("POST", window.location.protocol + "//" + window.location.host + "/pzpEnroll");
 		   req.setRequestHeader ("Content-Type", "application/json");
-		   req.send(JSON.stringify({"csr":data.payload.csr, "friendlyName": data.payload.friendlyName, from:data.from, "_csrf":csrf}));
+		   req.send(JSON.stringify({"csr":data.payload.csr, "friendlyName": data.payload.friendlyName, from:data.from, deviceType: data.payload.deviceType, "_csrf":csrf}));
 		   console.log("Sent XHR to " + window.location.protocol + "//" + window.location.host + "/pzpEnroll");
 	  } else if (data.payload && data.payload.status === "enrolmentSuccess") {
 	  		console.log("Enrolment success, going back to the PZP page.");

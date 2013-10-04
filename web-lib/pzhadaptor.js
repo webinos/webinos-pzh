@@ -111,6 +111,7 @@ function sendCommand(user, command, body, cb, id, err) {
         case 'revokePzp':
         case 'storeExternalCert':
         case 'unregisterService':
+        case 'setPhotoURL':
             pzhTLS.send(user, body, responseHandler(cb, err, id));
             break;
         default:

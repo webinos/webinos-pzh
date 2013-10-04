@@ -29,6 +29,8 @@ module.exports = function (app, authConfig, routeutil) {
         if (req.query.isPzp) {
             req.session.isPzp = true;
             req.session.pzpPort = req.query.port;
+            req.session.friendlyName = req.query.friendlyName;
+            req.session.deviceType = req.query.deviceType;
             isPzp = true;
         }
         if (req.isAuthenticated()) {

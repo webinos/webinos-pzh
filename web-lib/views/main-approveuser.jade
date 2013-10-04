@@ -8,7 +8,8 @@ block content
         dl
           - for(var i = 0; i < waiting.length; i++) {
             dt
-              input(type='checkbox', name='decision', value='#{waiting[i].id}') 
+              input(type='checkbox', name='decision', value='#{waiting[i].id}')
+              <img src='#{waiting[i].photoUrl}'/>
               | #{waiting[i].email} (#{waiting[i].displayName}) - hosted at <a href="https://#{waiting[i].host}">#{waiting[i].host}</a>.  
           -}
           dt
