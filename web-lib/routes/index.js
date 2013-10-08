@@ -99,8 +99,9 @@ module.exports = function (app, address, port, routeutil) {
         }
         if (req.user) {
             var proposedNick = req.user.username || req.user.displayName ||
-            (req.user.emails && req.user.emails[0] && req.user.emails[0].value && req.user.emails[0].value.split("@") || req.user.emails[0].value.split("@")[0] );
-            if (proposedNick){
+            (req.user.emails && req.user.emails[0] && req.user.emails[0].value && 
+             req.user.emails[0].value.split("@") && req.user.emails[0].value.split("@")[0] );
+            if (typeof proposedNick === "string"){
                proposedNick = proposedNick.trim().replace(" ", "").replace(":","").toLowerCase().replace(/\W/g, '');
             } else {
                proposedNick="Set your preferred nickname";
