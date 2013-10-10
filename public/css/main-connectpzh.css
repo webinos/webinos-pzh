@@ -1,0 +1,22 @@
+legend > .toggleLink {
+    float: none;
+    display: inline;
+}
+
+.toggle {
+    display: none;
+}
+
+.socialInvite {
+    display: inline;
+}
+.socialInvite > a {
+    padding-left: 5px;
+}
+.socialInvite img {
+    vertical-align: middle;
+}
+.inviteMail {
+    background-image: url('../images/invite_mail.png');
+}
+
