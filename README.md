@@ -100,6 +100,13 @@ The PZH comes pre-configured with support for Google and Yahoo sign-in.  Vanilla
 
 For Twitter and Facebook support you will need to add your own credentials, which you can download from their respective developer portals.
 
+#### Facebook instructions
+You need to go and register at [Facebook's developers site](https://developers.facebook.com/) and create a new App.
+Give a desired name (it will be displayed as a "via" source name when you use the direct friend invitation. You can change that any time.)
+Once you create it, go to the Basic Settings and set your PZH's server address and port under the "Site URL" of the "Website with Facebook Login" option (eg. https://192.168.1.50:443).
+On your PZH's webconfig.json, you need to enable the facebook authentication method and set the "App ID" as "clientID" and "App Secret" as "clientSecret".
+**Note:** Facebook will not allow you to send a direct invitation from a PZH server on a private network.
+
 ### Configuring login and user accounts
 
 At present, the PZH is designed to use a file system to record user account details, in combination with identifiers from social network logins (see above).  We would welcome contributions of alternative approaches.
