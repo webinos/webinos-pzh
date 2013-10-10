@@ -210,7 +210,7 @@ function configureTwitter(TwitterStrategy, passport, serverUrl, config) {
       throw "Twitter config invalid";
     }
     var twitterConfig = config.authentication.twitter;
-    if (twitterConfig.callbackURL == "") twitterConfig.callbackURL = getAuthURL(serverUrl, 'facebook', config);
+    if (twitterConfig.callbackURL == "") twitterConfig.callbackURL = getAuthURL(serverUrl, 'twitter', config);
     // Read configuration from the ./webinos-pzhWebServer directory.
     // Twitter is configured with three attributes:
     //{
