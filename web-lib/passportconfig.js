@@ -141,8 +141,7 @@ function validateConfigTwitter(config) {
            config.authentication.twitter.consumerSecret !== null && 
            config.authentication.twitter.consumerSecret !== "" &&
            config.authentication.twitter.hasOwnProperty("callbackURL") &&
-           config.authentication.twitter.callbackURL !== null &&
-           config.authentication.twitter.callbackURL !== "";
+           config.authentication.twitter.callbackURL !== null;
 }
 function validateConfigFacebook(config) {
     return config.hasOwnProperty("authentication") && 
@@ -154,8 +153,7 @@ function validateConfigFacebook(config) {
            config.authentication.facebook.clientSecret !== null && 
            config.authentication.facebook.clientSecret !== "" &&
            config.authentication.facebook.hasOwnProperty("callbackURL") &&
-           config.authentication.facebook.callbackURL !== null &&
-           config.authentication.facebook.callbackURL !== "";
+           config.authentication.facebook.callbackURL !== null;
 }
 
 function getApiKey(provider, config) {
@@ -175,6 +173,7 @@ function configureFacebook(FacebookStrategy, passport, serverUrl, config) {
       throw "Facebook config invalid";
     }
     var fbConfig = config.authentication.facebook;
+    if (fbConfig.callbackURL == "") fbConfig.callbackURL = getAuthURL(serverUrl, 'facebook', config);
     // Read configuration from the ./webinos-pzhWebServer directory.
     // Facebook is configured with three attributes:
     //{
@@ -211,6 +210,7 @@ function configureTwitter(TwitterStrategy, passport, serverUrl, config) {
       throw "Twitter config invalid";
     }
     var twitterConfig = config.authentication.twitter;
+    if (twitterConfig.callbackURL == "") twitterConfig.callbackURL = getAuthURL(serverUrl, 'facebook', config);
     // Read configuration from the ./webinos-pzhWebServer directory.
     // Twitter is configured with three attributes:
     //{
