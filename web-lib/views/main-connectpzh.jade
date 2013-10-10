@@ -1,43 +1,64 @@
 extends main
 
+block append stylesheets
+    link(rel="stylesheet", href="/css/main-connectpzh.css", type="text/css")
+
+block append scripts
+    script(src='/js/view-connectpzh.js')
+
 block content
-  -if (pzhlist.length !== 0) {
-    form(action="connect-friend-local", method="post")
-      fieldset#connect-local-friend.connect-fieldset
-        legend Connect to a personal zone at this website
-        select#pzh_list(name='nickname')
-          - for (var i = 0; i < pzhlist.length; i = i +1) {
-            option(value="#{pzhlist[i].nickname}") #{pzhlist[i].username} ( #{pzhlist[i].nickname} )      
-          - }
-        input(type='hidden', name='_csrf', value='#{_csrf}')
-        input(type='submit',value='Connect')
-  -}
-    form(action="connect-friend", method="post")
-      fieldset#connect-friend.connect-fieldset
-        legend Enter details manually
-        dl
-          dt
-            label Personal zone hub address (e.g., pzh.webinos.org)
-          dt
-            input#connectPzhId(type='text', name='pzhaddress', value='')
-          dt
-            label Nickname (e.g., 'alice')
-          dt
-            input#connectPzhId(type='text', name='nickname', value='')
-          dt
-            input(type='submit', value='Connect')
-          dt
-            input(type='hidden', name='_csrf', value='#{_csrf}')            
     fieldset#connect-friend.connect-fieldset
-      legend Send a link to a friend
-      p You can give the following URL to a friend to let them automatically connect to your personal zone.  
-      p
-        a(href="#{linkUrl}") #{linkUrl}
-      p Note that these links can only be used by one person, and should only be given to people that you trust to see your personal zone information, including whether your devices are active, and what services they offer.
-      -if (profile.from === "twitter") {
-      p Alternatively, you can send invitations directly through 
-        a(href="/invite") Twitter direct messages
-      -} else if (profile.from === "facebook") {
-      p Alternatively, you can send invitations directly through 
-        a(href="/invite") Facebook
-      -}
+        legend Invite a friend
+        p Give the following URL to a friend to let them automatically connect to your personal zone.
+        div
+            a(href="#{linkUrl}").invitationLink #{linkUrl}
+            div.socialInvite
+                a(href="mailto:?to=&subject=Invitation%20to%20my%20personal%20zone%20hub&body=Use%20this%20invitation%20link%20to%20connect%20to%20my%20webinos%20personal%20zone%20hub.%0A%0A#{linkUrl}")
+                  img(src="images/invite_mail.png")
+                a(data-popup="500x269", target="_blank", href="https://www.facebook.com/sharer.php?s=100&p[url]=#{linkUrl}&p[title]=Invitation%20to%20my%20personal%20zone%20hub&p[summary]=Use%20this%20invitation%20link%20to%20connect%20to%20my%20webinos%20personal%20zone%20hub.")
+                  img(src="images/invite_facebook.png")
+                a(data-popup="500x260", target="_blank", href="https://twitter.com/share?url=#{linkUrl}&text=Use%20this%20invitation%20link%20to%20connect%20to%20my%20webinos%20personal%20zone%20hub.")
+                  img(src="images/invite_twitter.png")
+                a(data-popup="500x350",target="_blank", href="https://plus.google.com/share?url=#{linkUrl}")
+                  img(src="images/invite_google-plus.png")
+                a(data-popup="520x500",target="_blank", href="https://www.linkedin.com/shareArticle?mini=true&url=#{linkUrl}&title=Invitation%20to%20my%20personal%20zone%20hub&summary=Use%20this%20invitation%20link%20to%20connect%20to%20my%20webinos%20personal%20zone%20hub.&source=webinos")
+                  img(src="images/invite_linkedin.png")
+
+        p Note that these links can only be used by one person, and should only be given to people that you trust to see your personal zone information, including whether your devices are active, and what services they offer.
+        -if (profile.from === "twitter") {
+        p Alternatively, you can send invitations directly through
+            a(href="/invite") Twitter direct messages
+        -} else if (profile.from === "facebook") {
+        p Alternatively, you can send invitations directly through
+            a(href="/invite") Facebook
+        -}
+    fieldset#connect-to.connect-fieldset
+      legend Manual connectivity
+      div.toggle
+        -if (pzhlist.length !== 0) {
+          form(action="connect-friend-local", method="post")
+            fieldset#connect-local-friend.connect-fieldset
+              legend Connect to a personal zone at this website
+              select#pzh_list(name='nickname')
+                - for (var i = 0; i < pzhlist.length; i = i +1) {
+                  option(value="#{pzhlist[i].nickname}") #{pzhlist[i].username} ( #{pzhlist[i].nickname} )
+                - }
+              input(type='hidden', name='_csrf', value='#{_csrf}')
+              input(type='submit',value='Connect')
+        -}
+        form(action="connect-friend", method="post")
+          fieldset#connect-friend.connect-fieldset
+            legend Enter details manually
+            dl
+              dt
+                label Personal zone hub address (e.g., pzh.webinos.org)
+              dt
+                input#connectPzhId(type='text', name='pzhaddress', value='')
+              dt
+                label Nickname (e.g., 'alice')
+              dt
+                input#connectPzhId(type='text', name='nickname', value='')
+              dt
+                input(type='submit', value='Connect')
+              dt
+                input(type='hidden', name='_csrf', value='#{_csrf}')

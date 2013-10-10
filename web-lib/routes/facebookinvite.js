@@ -44,7 +44,7 @@ var FacebookInvite = function(accessToken, appid, currentUser) {
 		console.log("Getting friend list");
 		FB.api("me/friends", { fields: 'id,name' }, function(result) {
 			if (!result || result.error) {
-				errortcb();
+				errorcb();
 			} else {
 				cb(result.data);
 			}
