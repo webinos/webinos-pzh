@@ -91,7 +91,8 @@ module.exports = function (app, authConfig, routeutil, serverAddress) {
             postAddress = "/invite-friend-facebook";
         } else {
             logger.log("Need either a facebook or twitter user account");
-            res.redirect("/");
+            res.redirect("/genericInvite");
+            return;
         }
 
         inviter.getContacts(function(userList) {
@@ -217,7 +218,7 @@ module.exports = function (app, authConfig, routeutil, serverAddress) {
         req.assert('friendId', 'No facebook ID given').notEmpty().len(2,20).isNumeric();
         if (!routeutil.isValid(req,res)) return;
         if (!routeutil.checkCSRF(req,res)) return;
-        pzhadaptor.registerToken( req.user, { "provider" : "twitter", "id":req.body.friendId }, function(reply) {
+        pzhadaptor.registerToken( req.user, { "provider" : "facebook", "id":req.body.friendId }, function(reply) {
             req.session.linkUrl = routeutil.getUrlForInviteRedirect(req.user.nickname, encodeURIComponent(reply.message));
             var fbInvite = require('./facebookinvite.js');
             var inviter = new fbInvite(req.user.accessToken, authConfig.facebook.app_id, req.user);
