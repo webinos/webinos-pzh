@@ -38,7 +38,7 @@ function enrol(pzpPort, user, pzhPort, pzhAddress, csrf) {
 	  } else if (data.payload && data.payload.status === "enrolmentSuccess") {
 	  		console.log("Enrolment success, going back to the PZP page.");
 			channel.close();
-			window.location.href = "http://localhost:"+pzpPort;	  		
+			window.location.href = "http://localhost:"+pzpPort+"/dashboard/";
 	  } else if (data.payload && data.payload.status === "enrolmentFailure") {
 	  		console.log("Enrolment failure.");
 	  		document.getElementById("mainContent").innerHtml = "<p>Could not enrol device into personal zone.</p>";
@@ -56,3 +56,4 @@ function enrol(pzpPort, user, pzhPort, pzhAddress, csrf) {
 	  channel.send(JSON.stringify(data));
   }
 }
+
