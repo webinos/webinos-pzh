@@ -42,7 +42,7 @@ PzhWebTLSCommunicator.init = function (config, webOptions, handler, cb) {
     //connection.setEncoding("utf8");
 
     connection.on("data", function (_buffer) {
-        wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+        wUtil.webinosMsgProcessing.readJson("webTLS", _buffer, function (obj) {
             var userid = obj.user.identifier || obj.user;
             if (userid in callbackStorage && callbackStorage[userid][obj.payload.type]) {
                 //logger.log("Message from Webinos TLS:\n" + JSON.stringify(obj.payload));
