@@ -52,7 +52,7 @@ function connectProvider(callback) {
             expect(pzhConnection.authorized).toEqual(true);
             var user = createPzh(pzhConnection, "hello0@webinos.org", "hello0");
             pzhConnection.on("data", function (_buffer) {
-                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                wUtil.webinosMsgProcessing.readJson(pzhConnection.address().address, _buffer, function (obj) {
                     if(obj.payload && obj.payload.type && obj.payload.type === "addPzh") {
                        expect(obj.payload.message.id).toContain(user.nickname);
                        callback(true);
@@ -95,7 +95,7 @@ describe("test web api of PZH", function(){
            expect(pzhConnection.authorized).toEqual(true);
            pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "getUserDetails"}})));
            pzhConnection.on("data", function (_buffer) {
-               wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+               wUtil.webinosMsgProcessing.readJson(pzhConnection.address().address, _buffer, function (obj) {
                    if(obj.payload && obj.payload.type && obj.payload.type === "getUserDetails") {
                        expect(obj.payload.message.authenticator).toEqual(user.from);
                        expect(obj.payload.message.friendlyName).toEqual(user.displayName);
@@ -113,7 +113,7 @@ describe("test web api of PZH", function(){
             expect(pzhConnection.authorized).toEqual(true);
             pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "getZoneStatus"}})));
             pzhConnection.on("data", function (_buffer) {
-                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                wUtil.webinosMsgProcessing.readJson(pzhConnection.address().address, _buffer, function (obj) {
                     if(obj.payload && obj.payload.type && obj.payload.type === "getZoneStatus") {
                         expect(obj.payload.message.pzps).toEqual([]);
                         expect(obj.payload.message.pzhs[0].id).toEqual(user.displayName+" (Your Pzh)");
@@ -132,7 +132,7 @@ describe("test web api of PZH", function(){
             expect(pzhConnection.authorized).toEqual(true);
             pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "getCrashLog"}})));
             pzhConnection.on("data", function (_buffer) {
-                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                wUtil.webinosMsgProcessing.readJson(pzhConnection.address().address, _buffer, function (obj) {
                     if(obj.payload && obj.payload.type && obj.payload.type === "getCrashLog") {
                         expect(obj.payload.message).not.toBeNull();
                         pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "getInfoLog"}})));
@@ -151,7 +151,7 @@ describe("test web api of PZH", function(){
             expect(pzhConnection.authorized).toEqual(true);
             pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "getPzps"}})));
             pzhConnection.on("data", function (_buffer) {
-                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                wUtil.webinosMsgProcessing.readJson(pzhConnection.address().address, _buffer, function (obj) {
                     if(obj.payload && obj.payload.type && obj.payload.type === "getPzps") {
                         expect(obj.payload.message.revokedCert).toEqual([]);
                         expect(obj.payload.message.signedCert).toEqual([]);
@@ -178,7 +178,7 @@ describe("test web api of PZH", function(){
             pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "csrFromPzp",
                 from: webinosMetaData.webinosName, csr: certificateInstance.internal.master.csr, friendlyName: "Test"}})));
             pzhConnection.on("data", function (_buffer) {
-                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                wUtil.webinosMsgProcessing.readJson(pzhConnection.address().address, _buffer, function (obj) {
                     if(obj.payload && obj.payload.type && obj.payload.type === "csrFromPzp") {
                         expect(obj.payload.message.from).toContain(user.nickname);
                         expect(obj.payload.message.to).toContain(webinosMetaData.webinosName);
@@ -200,7 +200,7 @@ describe("test web api of PZH", function(){
             expect(pzhConnection.authorized).toEqual(true);
             pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "listAllServices"}})));
             pzhConnection.on("data", function (_buffer) {
-                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                wUtil.webinosMsgProcessing.readJson(pzhConnection.address().address, _buffer, function (obj) {
                     if(obj.payload && obj.payload.type && obj.payload.type === "listAllServices") {
                         expect(obj.payload.message.pzEntityList[0].pzId).toContain(user.nickname);
                         expect(obj.payload.message.services[0].serviceAddress).toContain(user.nickname);
@@ -222,7 +222,7 @@ describe("test web api of PZH", function(){
             expect(pzhConnection.authorized).toEqual(true);
             pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "getAllPzh"}})));
             pzhConnection.on("data", function (_buffer) {
-                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                wUtil.webinosMsgProcessing.readJson(pzhConnection.address().address, _buffer, function (obj) {
                     if(obj.payload && obj.payload.type && obj.payload.type === "getAllPzh") {
                         expect(obj.payload.message).toEqual([]);
                         pzhConnection.socket.end();
@@ -238,7 +238,7 @@ describe("test web api of PZH", function(){
             pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "registerService",
                 at:pzhAddress+":"+providerWebServer+"_"+user.emails[0].value , name: "webinos-api-test"}})));
             pzhConnection.on("data", function (_buffer) {
-                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                wUtil.webinosMsgProcessing.readJson(pzhConnection.address().address, _buffer, function (obj) {
                     if(obj.payload && obj.payload.type && obj.payload.type === "registerService") {
                         console.log(obj.payload.message);
                         pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "unregisterService"}})));
@@ -257,7 +257,7 @@ describe("test web api of PZH", function(){
             expect(pzhConnection.authorized).toEqual(true);
             pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "revokePzp", pzpid: { 'url' : user.nickname + "@" + pzhAddress + "/machine0"}}})));
             pzhConnection.on("data", function (_buffer) {
-                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                wUtil.webinosMsgProcessing.readJson(pzhConnection.address().address, _buffer, function (obj) {
                     if(obj.payload && obj.payload.type && obj.payload.type === "revokePzp") {
                         expect(obj.payload.message).toBeTruthy();
                         pzhConnection.socket.end();
@@ -273,7 +273,7 @@ describe("test web api of PZH", function(){
             expect(pzhConnection.authorized).toEqual(true);
             pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "removePzh", id:user.nickname + "@" + pzhAddress }})));
             pzhConnection.on("data", function (_buffer) {
-              wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+              wUtil.webinosMsgProcessing.readJson(pzhConnection.address().address, _buffer, function (obj) {
                   if(obj.payload && obj.payload.type && obj.payload.type === "removePzh") {
                       console.log(obj.payload.message);
                       pzhConnection.socket.end();
