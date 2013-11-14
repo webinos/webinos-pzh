@@ -16,24 +16,36 @@
 *
 * Copyright 2011 Habib Virji, Samsung Electronics (UK) Ltd
 *******************************************************************************/
+var optimist = require('optimist');
+
 var pzh_provider  = require("./lib/pzh_provider.js");
 var pzh_web       = require("./web-lib/startweb.js");
+var wutil         = require("webinos-utilities");
 
 var host = null, name = null;
 
-var argv = require('optimist')
+var argv = optimist
     .usage('Usage: $0 --host = [host] --name = [name] (host is the domain of the server, name is the friendly name)')
     .default ('host', "")
     .default ('name', "")
+    .default ('debug', false)
     .default ('test', false)
     .argv;
+
+if (argv.help) {
+    optimist.showHelp ();
+    process.exit ();
+}
+
+var logger = wutil.webinosLogging(__filename);
+logger.setConfig(argv);
 
 var _pzh_provider = new pzh_provider(argv.host, argv.name);
 _pzh_provider.startProvider(function(result, details) {
   if (result) {
     pzh_web.startWS(argv.host, argv.name, details, testStart);
   } else {
-    console.error("ZONE PROVIDER FAILED TO START "+ details);
+    logger.error("ZONE PROVIDER FAILED TO START "+ details);
     testStart(false);
   }
 });
@@ -44,10 +56,10 @@ _pzh_provider.startProvider(function(result, details) {
 function testStart(hasStarted) {
   if (argv.test) {
     if (hasStarted) {
-      console.log("Started successfully.  This is a test, so the process is now exiting");
+      logger.log("Started successfully.  This is a test, so the process is now exiting");
       process.exit(0);
     } else {
-      console.log("The PZH Provider did not start successfully.  Ending.");
+      logger.log("The PZH Provider did not start successfully.  Ending.");
       process.exit(-1);
     }
   }
