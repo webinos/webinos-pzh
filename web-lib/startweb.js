@@ -65,7 +65,7 @@ starter.startWS = function(hostname, friendlyName, userPref, callback) {
                 return callback(false);
             } else if(loadWSCertificate(config, "webssl", "PzhSSL") && loadWSCertificate(config, "webclient", "PzhWS")){
 
-                logger.log("starting the web server on " + config.userPref.ports.provider_webServer);
+                logger.info("Starting web server: " + address + ":" + config.userPref.ports.provider_webServer);
                 pzhproviderweb.startWebServer(hostname,
                 address,
                 config.userPref.ports.provider_webServer,
