@@ -268,22 +268,7 @@ describe("test web api of PZH", function(){
         });
     });
 
-    it("remove pzh", function(done){
-        var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,function(){
-            expect(pzhConnection.authorized).toEqual(true);
-            pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "removePzh", id:user.nickname + "@" + pzhAddress }})));
-            pzhConnection.on("data", function (_buffer) {
-              wUtil.webinosMsgProcessing.readJson(pzhConnection.address().address, _buffer, function (obj) {
-                  if(obj.payload && obj.payload.type && obj.payload.type === "removePzh") {
-                      console.log(obj.payload.message);
-                      pzhConnection.socket.end();
-                      //    "revokePzp"             :revokePzp,  "csrAuthCodeByPzp"      :csrAuthCodeByPzp,
-                      done();
-                  }
-              });
-            });
-        });
-    });
+
 
     it("enroll PZP again", function(done){
         var webinosMetaData = {
@@ -332,4 +317,20 @@ describe("test web api of PZH", function(){
         });
     });
     // not repeating pzh certificate exchange as handled in pzp
+    it("remove pzh", function(done){
+        var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,function(){
+            expect(pzhConnection.authorized).toEqual(true);
+            pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "removePzh", id:user.nickname + "@" + pzhAddress }})));
+            pzhConnection.on("data", function (_buffer) {
+                wUtil.webinosMsgProcessing.readJson(pzhConnection.address().address, _buffer, function (obj) {
+                    if(obj.payload && obj.payload.type && obj.payload.type === "removePzh") {
+                        console.log(obj.payload.message);
+                        pzhConnection.socket.end();
+                        //    "revokePzp"             :revokePzp,  "csrAuthCodeByPzp"      :csrAuthCodeByPzp,
+                        done();
+                    }
+                });
+            });
+        });
+    });
 });
