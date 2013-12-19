@@ -106,6 +106,7 @@ function sendCommand(user, command, body, cb, id, err) {
         case 'registerToken':
         case 'rejectFriend':
         case 'removePzh':
+        case 'removePzp':
         case 'requestAddFriend':
         case 'requestAddLocalFriend':
         case 'revokePzp':

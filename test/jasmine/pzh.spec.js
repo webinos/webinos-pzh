@@ -268,21 +268,69 @@ describe("test web api of PZH", function(){
         });
     });
 
+
+
+    it("enroll PZP again", function(done){
+        var webinosMetaData = {
+            webinosRoot: webinosPath,
+            webinosType: "Pzp",
+            serverName: "0.0.0.0",
+            webinosName: "machine1"
+        };
+        var cert = require("webinos-certificateHandler");
+        var certificateInstance = new cert(webinosMetaData);
+        certificateInstance.generateSelfSignedCertificate("PzpCA", "PzpCA:machine1");
+        var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,function(){
+            expect(pzhConnection.authorized).toEqual(true);
+            pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "csrFromPzp",
+                from: webinosMetaData.webinosName, csr: certificateInstance.internal.master.csr, friendlyName: "Test2"}})));
+            pzhConnection.on("data", function (_buffer) {
+                wUtil.webinosMsgProcessing.readJson(pzhConnection.address().address, _buffer, function (obj) {
+                    if(obj.payload && obj.payload.type && obj.payload.type === "csrFromPzp") {
+                        expect(obj.payload.message.from).toContain(user.nickname);
+                        expect(obj.payload.message.to).toContain(webinosMetaData.webinosName);
+                        expect(obj.payload.message.payload.message.clientCert).not.toBeNull();
+                        expect(obj.payload.message.payload.message.masterCert).not.toBeNull();
+                        expect(obj.payload.message.payload.message.masterCrl).not.toBeNull();
+                        expect(obj.payload.message.payload.message.friendlyName).toEqual(user.displayName)
+                        pzhConnection.socket.end();
+                        done();
+                    }
+                });
+            });
+        });
+    });
+    it("remove pzp", function(done){
+        var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,function(){
+            expect(pzhConnection.authorized).toEqual(true);
+            pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "removePzp", id:user.nickname + "@" + pzhAddress +"/machine1"}})));
+            pzhConnection.on("data", function (_buffer) {
+                wUtil.webinosMsgProcessing.readJson(pzhConnection.address().address, _buffer, function (obj) {
+                    if(obj.payload && obj.payload.type && obj.payload.type === "removePzp") {
+                        console.log(obj.payload.message);
+                        pzhConnection.socket.end();
+                        //    "revokePzp"             :revokePzp,  "csrAuthCodeByPzp"      :csrAuthCodeByPzp,
+                        done();
+                    }
+                });
+            });
+        });
+    });
+    // not repeating pzh certificate exchange as handled in pzp
     it("remove pzh", function(done){
         var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,function(){
             expect(pzhConnection.authorized).toEqual(true);
             pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify({user: user, message: {type: "removePzh", id:user.nickname + "@" + pzhAddress }})));
             pzhConnection.on("data", function (_buffer) {
-              wUtil.webinosMsgProcessing.readJson(pzhConnection.address().address, _buffer, function (obj) {
-                  if(obj.payload && obj.payload.type && obj.payload.type === "removePzh") {
-                      console.log(obj.payload.message);
-                      pzhConnection.socket.end();
-                      //    "revokePzp"             :revokePzp,  "csrAuthCodeByPzp"      :csrAuthCodeByPzp,
-                      done();
-                  }
-              });
+                wUtil.webinosMsgProcessing.readJson(pzhConnection.address().address, _buffer, function (obj) {
+                    if(obj.payload && obj.payload.type && obj.payload.type === "removePzh") {
+                        console.log(obj.payload.message);
+                        pzhConnection.socket.end();
+                        //    "revokePzp"             :revokePzp,  "csrAuthCodeByPzp"      :csrAuthCodeByPzp,
+                        done();
+                    }
+                });
             });
         });
     });
-    // not repeating pzh certificate exchange as handled in pzp
 });
