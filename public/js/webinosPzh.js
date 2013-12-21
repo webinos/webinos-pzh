@@ -27,6 +27,7 @@ var webinosPZH = {
                     case 'unregisterService':
                     case 'registerService':
                     case 'removePzh':
+                    case 'removePzp':
                         if (webinosPZH.callbacks.has(msg.type,msg.msgid)) {
                           webinosPZH.callbacks.get(msg.type,msg.msgid)(msg.message);
                           webinosPZH.callbacks.unset(msg.type,msg.msgid);
@@ -137,6 +138,10 @@ var webinosPZH = {
         removePzh:function (id, callback) {
             var nextId = webinosPZH.callbacks.set('removePzh', callback);
             webinosPZH.send('removePzh', nextId, {id: id});
+        },
+        removePzp:function (id, callback) {
+            var nextId = webinosPZH.callbacks.set('removePzp', callback);
+            webinosPZH.send('removePzp', nextId, {id: id});
         }
     }
 };

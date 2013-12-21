@@ -36,7 +36,7 @@ if [ -d "$WEBINOS_PZH_DATA" ]; then
 fi
 
 prepare_pzh_config "config.json"
-node ./'webinos_pzh.js' &
+node ./'webinos_pzh.js' '--debug' &
 sleep 2
 echo "Started the PZH Provider and waited"
 
