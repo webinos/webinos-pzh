@@ -1,11 +1,10 @@
 function DisplayListOfDevices(payload){
 	$("#enumConnectedPzh").html("");
 	$("#enumConnectedPzp").html("");
-	var text = "";
+    var text = "", style;
 	if(payload && payload.pzhs) {
 	  for (var i = 0 ; i < payload.pzhs.length; i += 1){
-	  console.log(JSON.stringify(payload.pzhs));
-		var style = payload.pzhs[i].isConnected?"connected":"disconnected";
+            style = payload.pzhs[i].isConnected?"connected":"disconnected";
 		if (payload.pzhs[i].id.search("Your Pzh") === -1 ) {
 	      text +='<li><input type="image" src="/images/removePzh.jpg" id="payload.pzhs[i].id" height="15" width="15"'+
 	      'alt="button" onclick="webinosPZH.commands.removePzh(\''+payload.pzhs[i].url+'\', removePzh)">'+
@@ -17,8 +16,10 @@ function DisplayListOfDevices(payload){
 	  $("#enumConnectedPzh").html(text);
 	  text = "";
 	  for (i = 0 ; i < payload.pzps.length; i += 1){
-		var style = payload.pzps[i].isConnected?"connected":"disconnected";
-		text+= "<li><a class='"+ style +"' title='"+payload.pzps[i].url+"'>"+payload.pzps[i].id + "</a></li>";
+            style = payload.pzps[i].isConnected?"connected":"disconnected";
+            text +='<li><input type="image" src="/images/removePzh.jpg" id="payload.pzps[i].id" height="15" width="15"'+
+                'alt="button" onclick="webinosPZH.commands.removePzp(\''+payload.pzps[i].url+'\', removePzp)">'+
+                '<a class="'+ style +'" title="'+payload.pzps[i].url+'">'+payload.pzps[i].id + '</a> </input></li>'
 	  }
 	  $("#enumConnectedPzp").html(text);
 	}
@@ -44,13 +45,20 @@ function setApproveUserVisibility(next) {
   return;
 }
 function removePzh(payload) {
-	console.log(payload)
 	if(payload) {
 	  alert("pzh disconnected & removed from your trusted list");
 	  webinosPZH.commands.getZoneStatus(DisplayListOfDevices);
 	} else {
 	  alert("failed removing pzh from your trusted list");
 	}
+}
+function removePzp(payload) {
+    if(payload) {
+        alert("pzp disconnected & removed from your trusted list");
+        webinosPZH.commands.getZoneStatus(DisplayListOfDevices);
+    } else {
+        alert("failed removing pzp from your trusted list");
+    }
 }
 
 function showServiceForEntity(id) {
