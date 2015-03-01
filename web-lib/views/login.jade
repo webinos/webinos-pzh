@@ -29,27 +29,27 @@ html
       fieldset.boxBody
         - if (auth.google.enabled) {
         label Login using your Google ID
-        img(src='https://ssl.gstatic.com/images/logos/google_logo_41.png', width="100px")
+        img(src='/images/login_google.png', width="100px")
         input(type="button", class="btnLogin", onclick="loginGoogle()", value="Login via Google")
         - }
         - if (auth.yahoo.enabled) {
         label Login using your Yahoo! ID
-        img(src='http://l.yimg.com/a/images/ww/met/slimheader/yahoo-logo-sm-png8.png', width="100px")
+        img(src='/images/login_yahoo.png', width="100px")
         input(type="button", class="btnLogin", onclick="loginYahoo()", value="Login via Yahoo!")
         - }
         - if (auth.facebook.enabled) {
         label Login using your Facebook ID
-        img(src='http://cav2013.forsyte.at/files/facebook-logo.jpg', width="100px")
+        img(src='/images/login_facebook.png', height="45px")
         input(type="button", class="btnLogin", onclick="loginFacebook()", value="Login via Facebook")
         - }
         - if (auth.twitter.enabled) {
         label Login using your Twitter ID
-        img(src='https://twitter.com/images/resources/twitter-bird-light-bgs.png', height="45px")
+        img(src='/images/login_twitter.png', height="45px")
         input(type="button", class="btnLogin", onclick="loginTwitter()", value="Login via Twitter")
         - }
         - if (auth.openid.enabled) {
         label Login using OpenID (please enter your identifier)
-        img(src='http://openid.net/wordpress-content/themes/openid/images/logo_openid.png', width="100px")
+        img(src='/images/login_openid.png', width="100px")
         input(type="text", name="openid_identifier", id="openid_identifier")
         input(type="button", class="btnLogin", onclick="loginOpenID()", value="Login via OpenID")
         - }
