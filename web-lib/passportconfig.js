@@ -26,7 +26,7 @@ PassportConfig.createPassport = function(serverUrl, cb) {
     var passport = require('passport');
 
     var authConfig = {
-      "google"   : { enabled: false, apikey : null },
+      "google"   : { enabled: false, apikey : null, passportStrategyName: "google-openidconnect" },
       "yahoo"    : { enabled: false },
       "facebook" : { enabled: false, authpath: null, app_id : null },
       "twitter"  : { enabled: false, authpath: null, oauth: null },
@@ -38,8 +38,16 @@ PassportConfig.createPassport = function(serverUrl, cb) {
 
     // see if we support google.
     try {
-        if (isIdpEnabled("google", fileConfig)) {  
-            configureGoogle( require('passport-google').Strategy, passport, serverUrl, fileConfig );
+        if (isIdpEnabled("google", fileConfig)) {
+            var gStrategy = null;
+            if (isGoogleOpenIdConnect(fileConfig)){
+                gStrategy = require('passport-google-openidconnect').Strategy;
+            } else {
+                gStrategy = require('passport-google').Strategy;
+                authConfig.google.passportStrategyName = "google";
+                console.warn("OAuth 2.0 credentials not found for Google authentication in webconfig.json. Fallback to Google's DEPRECATED OpenID method.")
+            }
+            configureGoogle(gStrategy, passport, serverUrl, fileConfig );
             authConfig.google.enabled = true;
             authConfig.google.authpath = getAuthPath(serverUrl, "google", fileConfig);
             authConfig.google.apikey = getApiKey("google", fileConfig);
@@ -260,22 +268,54 @@ function configureOpenId(OpenIDStrategy, passport, serverUrl, config) {
     ));
 }
 
+function isGoogleOpenIdConnect(config) {
+    return config.hasOwnProperty("authentication") &&
+        config.authentication.hasOwnProperty("google") &&
+        config.authentication["google"].hasOwnProperty("clientID") &&
+        typeof(config.authentication["google"].clientID) === "string" &&
+        config.authentication["google"].clientID !== "" &&
+        config.authentication["google"].hasOwnProperty("clientSecret") &&
+        typeof(config.authentication["google"].clientSecret) === "string" &&
+        config.authentication["google"].clientSecret !== "";
+}
+
 function configureGoogle(GoogleStrategy, passport, serverUrl, config) {
-    passport.use(new GoogleStrategy({
-            returnURL:getAuthURL(serverUrl, 'google', config),
-            realm:getAuthRealm(serverUrl, 'google', config),
-            profile:true,
+    var cnf = {
+        returnURL:getAuthURL(serverUrl, 'google', config),
+        realm:getAuthRealm(serverUrl, 'google', config),
+        profile:true
 //            pape:{ 'maxAuthAge' : 600 }
-        },
-        function (identifier, profile, done) {
-            "use strict";
-            process.nextTick(function () {
-                profile.from = "google";
-                profile.identifier = identifier;
-                return getPzhStatus(profile, done);
-            });
-        }
-    ));
+    };
+    var googleCb = function (identifier, profile, done) {
+        "use strict";
+        process.nextTick(function () {
+            profile.from = "google";
+            profile.identifier = identifier;
+            return getPzhStatus(profile, done);
+        });
+    };
+    if (isGoogleOpenIdConnect(config)){
+        cnf.callbackURL = getAuthURL(serverUrl, 'google', config);
+        cnf.clientID = config.authentication["google"].clientID;
+        cnf.clientSecret = config.authentication["google"].clientSecret;
+        cnf.scope = "profile email";
+
+
+        var googleCb2 = googleCb;
+        googleCb = function(iss, sub, profile, accessToken, refreshToken, verified) {
+            profile.emails = [{ "value" : profile._json.email }];
+            if (profile._json.picture) {//TODO: proper check
+                var parsed = url.parse(profile._json.picture, true);
+                delete parsed.query;
+                delete parsed.search;
+                profile.photoUrl = url.format(parsed);
+            }
+            profile.accessToken = accessToken;
+            profile.refreshToken = refreshToken;
+            googleCb2(sub, profile, verified);
+        };
+    }
+    passport.use(new GoogleStrategy(cnf, googleCb));
 }
 
 function configureYahoo(YahooStrategy, passport, serverUrl, config) {

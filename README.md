@@ -98,7 +98,13 @@ http://thingsilearned.com/2009/05/26/gnu-screen-super-basic-tutorial/
 
 The PZH comes pre-configured with support for Google and Yahoo sign-in.  Vanilla OpenID is also available, although turned off.  To turn it on, and to enable Twitter and Facebook, you need to edit the file [webinos-pzh/node_modules/webinos-pzhWebServer/config.json](https://github.com/webinos/webinos-pzhWebServer/blob/master/config.json).  
 
-For Twitter and Facebook support you will need to add your own credentials, which you can download from their respective developer portals.
+For Google, Twitter and Facebook support you will need to add your own credentials, which you can download from their respective developer portals.
+
+#### Google instructions
+You need to go and register at [Google's developers console](https://console.developers.google.com/) and create a new Project.
+Under the "APIs & auth" menu, enable "Google+ API", make a "Consent screen" and create "Credentials" for an "OAuth" "Client ID". For the Client ID, select "Web Application" for "APPLICATION TYPE" and specify all the "AUTHORIZED REDIRECT URIS" that you want the credentials to work with (eg. https://127.0.0.1/auth/google/return). You don't need to specify any "AUTHORIZED JAVASCRIPT ORIGINS" and you can always change the redirect URIs.
+On your PZH's webconfig.json, you need to set the "CLIENT ID" as "clientID" and "CLIENT SECRET" as "clientSecret".
+**Note:** If you don't provide both clientID and clientSecret, the fallback deprecated Google OpenID 2.0 authentication method will be used.
 
 #### Facebook instructions
 You need to go and register at [Facebook's developers site](https://developers.facebook.com/) and create a new App.

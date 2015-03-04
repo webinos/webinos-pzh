@@ -59,9 +59,9 @@ module.exports = function (app, authConfig, routeutil) {
     }
     
     if (authConfig.google.enabled) {
-        app.get('/auth/google', passport.authenticate('google'));
+        app.get('/auth/google', passport.authenticate(authConfig.google.passportStrategyName));
         app.get(authConfig.google.authpath,
-            passport.authenticate('google', { failureRedirect:'/login' }), routeutil.doPostLoginRedirect);
+            passport.authenticate(authConfig.google.passportStrategyName, { failureRedirect:'/login' }), routeutil.doPostLoginRedirect);
     }
     
     
